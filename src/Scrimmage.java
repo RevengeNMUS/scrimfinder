@@ -1,18 +1,20 @@
+import java.io.File;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Basically, a Scrimmage
- * Has a
- * list of teams
- * Date
- * Location
- * Region
- * Application Status (open, closed)
- * Organizer
- * A Size Limit
- * A Start/End Time
+ * Basically, a Scrimmage!<p>
+ * Has a<br>
+ * list of teams<br>
+ * Date<br>
+ * Location<br>
+ * Region<br>
+ * Application Status (open, closed)<br>
+ * Organizer<br>
+ * A Size Limit<br>
+ * A Start/End Time<br>
  */
 public interface Scrimmage {
     /**
@@ -36,7 +38,7 @@ public interface Scrimmage {
     /**
      * Sets the end time for the event
      */
-    public void setEndTime(LocalDateTime sl);
+    public void setEndTime(LocalDateTime et);
 
     /**
      * @return the start time for the event
@@ -52,11 +54,6 @@ public interface Scrimmage {
      * Sets the size limit for the event
      */
     public void setSizeLimit(int sl);
-
-    /**
-     * Sets the Date for the event
-     */
-    public void setDate(Date date);
 
     /**
      * Sets the Location for the event
@@ -77,11 +74,6 @@ public interface Scrimmage {
      * @return an ArrayList of teams signed up/participating in this scrimmage
      */
     public ArrayList<Team> teamsInScrim();
-
-    /**
-     * @return the {@link Date} that the scrimmage will happen on
-     */
-    public Date dateOfScrim();
 
     /**
      * @return the {@link Location} of the scrimmage
@@ -112,4 +104,22 @@ public interface Scrimmage {
      */
     public boolean isFull();
 
+    /**
+     * checks if this scrimmage already has team t signed up
+     */
+    public boolean hasTeam(Team t);
+
+    /**
+     * saves the scrimmages data into a file wawwww
+     * when implementation is made, MAKE SURE CONSTRUCTOR CAN TAKE A FILE AS PARAM
+     * you RAT
+     */
+    public File saveToFile();
+
+    /**
+     * Returns this scrims (hopefully :>) unique identifier<br>
+     * if it isnt unique<br>
+     * we are screwed
+     */
+    public String getIdentifier();
 }
