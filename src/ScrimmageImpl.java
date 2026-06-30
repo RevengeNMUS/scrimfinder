@@ -58,7 +58,7 @@ public class ScrimmageImpl implements Scrimmage {
             var teamsList = teamsString.split(", ");
             for (String team : teamsList) {
                 try {
-                    teams.add(new Team(new File("team/" + team + ".txt")));
+                    teams.add(new Team(new File(MainConstants.TEAM_PATH + team + ".txt")));
                 } catch (FileNotFoundException e) {
                     teams.add(new Team(Integer.parseInt(team)));
                 }
@@ -75,7 +75,7 @@ public class ScrimmageImpl implements Scrimmage {
         Team organizer;
 
         try {
-            organizer = new Team(new File("team/" + stringSpmaxlitByNewline[4] + ".txt"));
+            organizer = new Team(new File(MainConstants.TEAM_PATH + stringSpmaxlitByNewline[4] + ".txt"));
         } catch (FileNotFoundException e) {
             organizer = new Team(Integer.parseInt(stringSpmaxlitByNewline[4]));
         }
@@ -267,8 +267,8 @@ public class ScrimmageImpl implements Scrimmage {
      *
      */
     @Override
-    public File saveToFile() {
-        var uri = "scrimmages/" + getIdentifier()  + ".txt";
+    public File saveToFile() throws IOException {
+        var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".txt";
 
         try (var fileizer = new FileWriter(uri))
         {
@@ -285,7 +285,7 @@ public class ScrimmageImpl implements Scrimmage {
                     endTimeString;
             fileizer.write(string);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IOException(e);
         }
         return new File(uri);
     }

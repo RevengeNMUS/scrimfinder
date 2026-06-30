@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -114,7 +115,7 @@ public interface Scrimmage {
      * when implementation is made, MAKE SURE CONSTRUCTOR CAN TAKE A FILE AS PARAM
      * you RAT
      */
-    public File saveToFile();
+    public File saveToFile() throws IOException;
 
     /**
      * Returns this scrims (hopefully :>) unique identifier<br>

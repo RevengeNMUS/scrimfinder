@@ -88,7 +88,7 @@ public class Team {
         if (!scrimListString.isBlank()) {
             var scrimList = scrimListString.split(", ");
             for (String scrim : scrimList) {
-                activeScrimmages.add(ScrimmageImpl.fromFile(new File("scrimmages/" + scrim + ".txt")));
+                activeScrimmages.add(ScrimmageImpl.fromFile(new File(MainConstants.SCRIM_PATH + scrim + ".txt")));
             }
         }
 
@@ -97,7 +97,7 @@ public class Team {
         if (!scrimListString.isBlank()) {
             var scrimList = scrimListString.split(", ");
             for (String scrim : scrimList) {
-                organizedScrimmages.add(ScrimmageImpl.fromFile(new File("scrimmages/" + scrim + ".txt")));
+                organizedScrimmages.add(ScrimmageImpl.fromFile(new File(MainConstants.SCRIM_PATH + scrim + ".txt")));
             }
         }
     }
@@ -118,8 +118,8 @@ public class Team {
      * IMPLIMENT IT YOUBHB KJSGFVSG<FU
      * saves team data in a file!
      */
-    public File saveTeam() {
-        try (FileWriter rwefrrn = new FileWriter("team/" + teamNum + ".txt")) {
+    public File saveTeam() throws IOException {
+        try (FileWriter rwefrrn = new FileWriter(MainConstants.TEAM_PATH + teamNum + ".txt")) {
             var writeString =
                     teamNum + "\n" +
                     teamName + "\n" +
@@ -130,10 +130,10 @@ public class Team {
             rwefrrn.write(writeString);
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IOException(e);
         }
 
-        return new File("team/" + teamNum + ".txt");
+        return new File(MainConstants.TEAM_PATH + teamNum + ".txt");
     }
 
     @Override
