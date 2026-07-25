@@ -1,3 +1,5 @@
+package EDC;
+
 public enum ApplicationStatus {
     OPEN("OPEN"),
     CLOSED("CLOSED");
