@@ -1,9 +1,9 @@
-package scrimfinder;
+package com.scrimfinder.scrimfinder;
 
-import EDC.ApplicationStatus;
-import EDC.Location;
-import EDC.Region;
-import SearchMethods.ScrimSearch;
+import com.scrimfinder.EDC.ApplicationStatus;
+import com.scrimfinder.EDC.Location;
+import com.scrimfinder.EDC.Region;
+import com.scrimfinder.SearchMethods.ScrimSearch;
 
 import java.io.File;
 import java.io.IOException;

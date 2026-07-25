@@ -1,6 +1,6 @@
-package scrimfinder;
+package com.scrimfinder.scrimfinder;
 
-import EDC.Region;
+import com.scrimfinder.EDC.Region;
 
 import java.io.File;
 import java.io.FileNotFoundException;

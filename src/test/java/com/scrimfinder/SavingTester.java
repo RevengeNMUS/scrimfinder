@@ -1,4 +1,6 @@
-import scrimfinder.SavingTesters;
+package com.scrimfinder;
+
+import com.scrimfinder.scrimfinder.SavingTesters;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;

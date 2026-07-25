@@ -1,4 +1,4 @@
-package scrimfinder;
+package com.scrimfinder.scrimfinder;
 
 import java.io.IOException;
 
