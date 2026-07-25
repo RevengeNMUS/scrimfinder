@@ -1,4 +1,4 @@
-package scrimfinder;
+package com.scrimfinder.scrimfinder;
 
 public class MainConstants {
     public static final String SCRIM_PATH = "scrimmages/";

@@ -1,4 +1,4 @@
-package EDC;
+package com.scrimfinder.EDC;
 
 /**
  * A location on Earth!<p>

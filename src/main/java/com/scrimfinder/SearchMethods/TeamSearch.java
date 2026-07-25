@@ -1,6 +1,6 @@
-package SearchMethods;
+package com.scrimfinder.SearchMethods;
 
-import scrimfinder.Team;
+import com.scrimfinder.scrimfinder.Team;
 
 /**
  * TEAM FINDERRRRR

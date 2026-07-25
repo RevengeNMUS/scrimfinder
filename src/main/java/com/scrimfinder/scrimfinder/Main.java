@@ -1,7 +1,7 @@
-package scrimfinder;
+package com.scrimfinder.scrimfinder;
 
-import SearchMethods.ScrimSearch;
-import SearchMethods.TeamSearch;
+import com.scrimfinder.SearchMethods.ScrimSearch;
+import com.scrimfinder.SearchMethods.TeamSearch;
 
 import java.io.File;
 import java.io.IOException;
