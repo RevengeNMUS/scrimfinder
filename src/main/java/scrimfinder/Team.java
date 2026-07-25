@@ -1,3 +1,7 @@
+package scrimfinder;
+
+import EDC.Region;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -7,11 +11,11 @@ import java.util.Objects;
 import java.util.Scanner;
 
 /**
- * A Team! <p>
+ * A main.java.scrimfinder.Team! <p>
  * Has a: <br>
- * Team number<br>
- * Team name<br>
- * Region<br>
+ * main.java.scrimfinder.Team number<br>
+ * main.java.scrimfinder.Team name<br>
+ * EDC.Region<br>
  * Active Scrims<br>
  * Scrims Organized<br>
  */

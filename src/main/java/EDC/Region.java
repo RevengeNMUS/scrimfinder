@@ -1,6 +1,4 @@
-import java.util.Arrays;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+package EDC;
 
 public enum Region {
     NORCAL("norcal"),

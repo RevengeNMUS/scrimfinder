@@ -1,3 +1,9 @@
+package scrimfinder;
+
+import EDC.ApplicationStatus;
+import EDC.Location;
+import EDC.Region;
+
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -5,11 +11,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Basically, a Scrimmage!<br>
+ * Basically, a main.java.scrimfinder.Scrimmage!<br>
  * Has a
  * <li>list of teams</li>
- * <li>Location</li>
- * <li>Region</li>
+ * <li>EDC.Location</li>
+ * <li>EDC.Region</li>
  * <li>Application Status (open, closed)</li>
  * <li>Organizer</li>
  * <li>A Size Limit</li>
@@ -164,7 +170,7 @@ public class ScrimmageImpl implements Scrimmage {
     }
 
     /**
-     * Sets the Location for the event
+     * Sets the EDC.Location for the event
      *
      * @param location
      */
@@ -174,7 +180,7 @@ public class ScrimmageImpl implements Scrimmage {
     }
 
     /**
-     * Sets the Region for the event
+     * Sets the EDC.Region for the event
      *
      * @param region
      */
@@ -184,7 +190,7 @@ public class ScrimmageImpl implements Scrimmage {
     }
 
     /**
-     * Sets the ApplicationStatus for the event
+     * Sets the EDC.ApplicationStatus for the event
      *
      * @param appStatus
      */
@@ -210,7 +216,7 @@ public class ScrimmageImpl implements Scrimmage {
     }
 
     /**
-     * @return the region that the Scrimmage will happen in
+     * @return the region that the main.java.scrimfinder.Scrimmage will happen in
      * Used for filtering results?
      */
     @Override

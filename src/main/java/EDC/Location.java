@@ -1,5 +1,4 @@
-import java.lang.foreign.AddressLayout;
-import java.util.Locale;
+package EDC;
 
 /**
  * A location on Earth!<p>
@@ -57,7 +56,7 @@ public class Location {
 
     @Override
     public String toString() {
-        return "Location{" +
+        return "EDC.Location{" +
                 "longitude=" + longitude +
                 ", latitude=" + latitude +
                 ", address='" + address + '\'' +

@@ -1,3 +1,5 @@
+package scrimfinder;
+
 import java.io.IOException;
 
 public class ResourceNotFoundException extends IOException {
