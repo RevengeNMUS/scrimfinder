@@ -13,6 +13,18 @@ import com.scrimfinder.scrimfinder.Team;
  * Look at findTeams to learn more (not a pyramid scheme)
  */
 public interface TeamSearch {
+    public static TeamSearch ALWAYS_FOUND = new TeamSearch () {
+        @Override
+        public boolean isFound(Team team) {
+            return true;
+        }
+
+        @Override
+        public String finderMethod() {
+            return "always found";
+        }
+    };
+
     public boolean isFound(Team team);
 
     public String finderMethod();

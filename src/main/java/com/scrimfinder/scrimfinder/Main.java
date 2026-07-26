@@ -1,19 +1,20 @@
 package com.scrimfinder.scrimfinder;
 
-import com.scrimfinder.SearchMethods.ScrimSearch;
-import com.scrimfinder.SearchMethods.TeamSearch;
+import com.scrimfinder.SearchMethods.*;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Main {
+@Repository
+public class Main implements AutoCloseable{
     private static final ReentrantLock rwlock = new ReentrantLock(true);
     public static final ArrayList<Scrimmage> scrims = new ArrayList<>();
     public static final ArrayList<Team> teams = new ArrayList<>();
@@ -48,12 +49,10 @@ public class Main {
             throw new TimeoutException();
         }
 
-        try (var scrimFileStream = Files.list(Path.of(MainConstants.SCRIM_PATH))) {
-            var pathsArray = scrimFileStream.toArray();
-            var pathsList = List.of(pathsArray);
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Path.of(MainConstants.SCRIM_PATH))) {
             scrims.clear();
-            pathsList.forEach(path -> {
-                scrims.add(ScrimmageImpl.fromFile(new File((String) path)));
+            stream.forEach(path -> {
+                scrims.add(ScrimmageImpl.fromFile(new File(path.toUri())));
             });
             return true;
         } finally {
@@ -66,13 +65,10 @@ public class Main {
             throw new TimeoutException();
         }
 
-        try (var teamFileStream = Files.list(Path.of(MainConstants.TEAM_PATH))) {
-
-            var pathsArray = teamFileStream.toArray();
-            var pathsList = List.of(pathsArray);
-            scrims.clear();
-            for (Object path : pathsList) {
-                teams.add(new Team(new File((String) path)));
+        teams.clear();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Path.of(MainConstants.TEAM_PATH))) {
+            for (Path path : stream) {
+                teams.add(new Team(new File(path.toUri())));
             }
             return true;
         } finally {
@@ -181,5 +177,11 @@ public class Main {
         saveTeams();
         saveScrims();
         return true;
+    }
+
+    @Override
+    public void close() throws Exception {
+        saveScrims();
+        saveTeams();
     }
 }

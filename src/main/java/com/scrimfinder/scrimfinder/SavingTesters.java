@@ -1,9 +1,7 @@
 package com.scrimfinder.scrimfinder;
 
-import com.scrimfinder.EDC.ApplicationStatus;
-import com.scrimfinder.EDC.Location;
-import com.scrimfinder.EDC.Region;
-import com.scrimfinder.SearchMethods.ScrimSearch;
+import com.scrimfinder.EDC.*;
+import com.scrimfinder.SearchMethods.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +13,7 @@ public class SavingTesters {
     public static void nonMainSavingTester() throws IOException {
         Team organizer = new Team(12635, "Kuriosity Robotics", Region.NORCAL);
         organizer.saveTeam();
-        Location loc = new Location(-121.8863, 37.3382, "123 main.java.scrimfinder.Main St", "San Jose", "CA", "USA");
+        Location loc = new Location(-121.8863, 37.3382, "123 Main St", "San Jose", "CA", "USA");
         ArrayList<Team> teams = new ArrayList<>();
         teams.add(organizer);
 
@@ -66,7 +64,7 @@ public class SavingTesters {
         Main mane = new Main();
         Team organizer = new Team(12635, "Kuriosity Robotics", Region.NORCAL);
         mane.addTeam(organizer);
-        Location loc = new Location(-121.8863, 37.3382, "123 main.java.scrimfinder.Main St", "San Jose", "CA", "USA");
+        Location loc = new Location(-121.8863, 37.3382, "123 Main St", "San Jose", "CA", "USA");
         ArrayList<Team> teams = new ArrayList<>();
         teams.add(organizer);
         mane.addScrim(new ScrimmageImpl(
@@ -103,7 +101,7 @@ public class SavingTesters {
 
             @Override
             public String finderMethod() {
-                return "EDC.Region, NORCAL";
+                return "Region, NORCAL";
             }
         })) {
             printScrimInfo(scrim);
@@ -119,7 +117,7 @@ public class SavingTesters {
 
             @Override
             public String finderMethod() {
-                return "EDC.Region, SOCAL";
+                return "Region, SOCAL";
             }
         })) {
             printScrimInfo(scrim);
