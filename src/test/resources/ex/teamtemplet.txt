@@ -1,0 +1,5 @@
+num
+name
+region
+attended scrims
+hosted scrims

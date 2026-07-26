@@ -56,7 +56,7 @@ public class Location {
 
     @Override
     public String toString() {
-        return "EDC.Location{" +
+        return "Location{" +
                 "longitude=" + longitude +
                 ", latitude=" + latitude +
                 ", address='" + address + '\'' +

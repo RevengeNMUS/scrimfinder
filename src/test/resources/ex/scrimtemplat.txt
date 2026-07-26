@@ -1,0 +1,8 @@
+[team, team, team]
+location.address-location.city-location.state-location.country-location.latitude-location.longitude
+regionCode
+appStatus
+teamNum
+sizeLimit
+dd_MM_yyyy_HH
+dd_MM_yyyy_HH
