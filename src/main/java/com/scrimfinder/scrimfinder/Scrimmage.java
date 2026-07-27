@@ -1,6 +1,8 @@
 package com.scrimfinder.scrimfinder;
 
 import com.scrimfinder.EDC.*;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -111,6 +113,8 @@ public interface Scrimmage {
      * checks if this scrimmage already has team t signed up
      */
     public boolean hasTeam(Team t);
+
+    ObjectNode getONode(ObjectMapper oMapper);
 
     /**
      * saves the scrimmages data into a file wawwww
