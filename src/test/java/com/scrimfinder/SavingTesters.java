@@ -1,7 +1,8 @@
-package com.scrimfinder.scrimfinder;
+package com.scrimfinder;
 
 import com.scrimfinder.EDC.*;
 import com.scrimfinder.SearchMethods.*;
+import com.scrimfinder.scrimfinder.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class SavingTesters {
 
         System.out.println("___________________________________ \n ___________________________________");
 
-        Scrimmage savedScrim = ScrimmageImpl.fromFile(new File(MainConstants.SCRIM_PATH + "12635-San Jose-25_06_2026.txt"));
+        Scrimmage savedScrim = ScrimmageImpl.fromFile(new File(MainConstants.TEST_SCRIM_PATH + "12635-San Jose-25_06_2026.txt"));
         printScrimInfo(savedScrim);
     }
 
@@ -84,7 +85,7 @@ public class SavingTesters {
 
         System.out.println("___________________________________ \n ___________________________________");
 
-        Scrimmage savedScrim = ScrimmageImpl.fromFile(new File(MainConstants.SCRIM_PATH + "12635-San Jose-25_06_2026.txt"));
+        Scrimmage savedScrim = ScrimmageImpl.fromFile(new File(MainConstants.TEST_SCRIM_PATH + "12635-San Jose-25_06_2026.txt"));
         printScrimInfo(savedScrim);
 
         System.out.println("___________________________________ \n _____ \n ___________________________________");

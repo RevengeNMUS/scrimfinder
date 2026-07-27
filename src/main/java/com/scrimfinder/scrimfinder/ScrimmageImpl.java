@@ -1,7 +1,7 @@
 package com.scrimfinder.scrimfinder;
 
 import com.scrimfinder.EDC.*;
-import tools.jackson.core.JsonPointer;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 
 /**
  * Basically, a Scrimmage!<br>
@@ -23,7 +24,7 @@ import java.util.Scanner;
  * <li>A Start/End Time</li>
  */
 public class ScrimmageImpl implements Scrimmage {
-    public static final ScrimmageImpl NULL_SCRIM = new ScrimmageImpl(new ArrayList<>(), Location.NULL_LOCATION, Region.NA, ApplicationStatus.CLOSED, Team.NULL_TEAM, 0, LocalDateTime.of(0, 1, 1, 0, 0), LocalDateTime.of(0, 1, 1, 0, 0));
+    public static final ScrimmageImpl NULL_SCRIM = new ScrimmageImpl(new ArrayList<>(), Location.NULL_LOCATION, Region.KNOWHERE, ApplicationStatus.CLOSED, Team.NULL_TEAM, 0, LocalDateTime.of(0, 1, 1, 0, 0), LocalDateTime.of(0, 1, 1, 0, 0));
 
     public ArrayList<Team> teams;
     public Location location;
@@ -41,61 +42,64 @@ public class ScrimmageImpl implements Scrimmage {
         this.applicationStatus = applicationStatus;
         this.organizer = organizer;
         this.sizeLimit = sizeLimit;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startTime = startTime.plusMinutes(startTime.getMinute()%15 < 8 ? -(startTime.getMinute()%15) : (15-startTime.getMinute()%15)).withSecond(0).withNano(0); //round to 67
+        this.endTime = endTime.plusMinutes(endTime.getMinute()%15 < 8 ? -(endTime.getMinute()%15) : (15-endTime.getMinute()%15)).withSecond(0).withNano(0);
     }
 
     public static ScrimmageImpl fromFile(File file) {
+        ObjectMapper oMapper = new ObjectMapper();
         String fileString;
         //todo impl it actually maybe :0
         try (Scanner reeder = new Scanner(file)) {
             StringBuilder string = new StringBuilder();
             while (reeder.hasNextLine()) {
-                string.append(reeder.nextLine()).append("\n");
+                string.append(reeder.nextLine()).append(" ");
             }
-            fileString = string.toString();
+            JsonNode jsonNode = oMapper.readTree(file);
+
+            return fromJNode(jsonNode);
         } catch (IOException e) {
             return NULL_SCRIM;
         }
+    }
 
-        var stringSpmaxlitByNewline = fileString.split("\n");
-        var teamsString = stringSpmaxlitByNewline[0].substring(1, stringSpmaxlitByNewline[0].length() - 1);
-        var teams = new ArrayList<Team>();
-        if (!teamsString.isBlank()) {
-            var teamsList = teamsString.split(", ");
-            for (String team : teamsList) {
-                try {
-                    teams.add(new Team(new File(MainConstants.TEAM_PATH + team + ".txt")));
-                } catch (FileNotFoundException e) {
-                    teams.add(new Team(Integer.parseInt(team)));
-                }
-            }
+    public static ScrimmageImpl fromJNode(JsonNode jsonNode) throws IOException {
+
+        ArrayList<Team> teams = new ArrayList<>();
+        var tArrNode = jsonNode.get("teams").asArray();
+        for (JsonNode tNode : tArrNode.elements()) {
+            teams.add(Team.of(new File(MainConstants.TEAM_PATH + tNode.get("teamNum").asInt(0) + ".txt"))); // mark all teams as atendees for ts srim you drat
         }
 
-        var locList = stringSpmaxlitByNewline[1].split("_");
-        var location = new Location(Double.parseDouble(locList[5]), Double.parseDouble(locList[4]), locList[0], locList[1], locList[2], locList[3]);
+        var locNode = jsonNode.get("location");
+        var location = new Location(locNode.get("longitude").asDouble(0.0), locNode.get("latitude").asDouble(0.0), locNode.get("address").asString(" "), locNode.get("city").asString(" "), locNode.get("state").asString(" "), locNode.get("country").asString(" "));
 
-        var region = Region.fromCode(stringSpmaxlitByNewline[2]);
+        var region = Region.fromCode(jsonNode.get("region").asString("KNOWHERE"));
 
-        var applicationStatus = ApplicationStatus.fromStatusString(stringSpmaxlitByNewline[3]);
+        var applicationStatus = ApplicationStatus.valueOf(jsonNode.get("appStatus").asString("CLOSED"));
 
         Team organizer;
-
         try {
-            organizer = new Team(new File(MainConstants.TEAM_PATH + stringSpmaxlitByNewline[4] + ".txt"));
+            organizer = Team.of(new File(MainConstants.TEAM_PATH + jsonNode.get("organizer").get("teamNum").asInt(0) + ".txt"));
         } catch (FileNotFoundException e) {
-            organizer = new Team(Integer.parseInt(stringSpmaxlitByNewline[4]));
+            organizer = new Team(jsonNode.get("organizer").get("teamNum").asInt(0));
         }
 
-        var sizeLimit = Integer.parseInt(stringSpmaxlitByNewline[5]);
+        var sizeLimit = jsonNode.get("size").asInt(1);
 
-        var parser = DateTimeFormatter.ofPattern("MM_dd_yyyy_HH");
-        var startDT = stringSpmaxlitByNewline[6];
+        var parser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        var startDT = jsonNode.get("startTime").asString("0000-00-00'T'00:00:00");
         var startTime = LocalDateTime.parse(startDT, parser);
-        var endDT = stringSpmaxlitByNewline[7];
+        var endDT = jsonNode.get("endTime").asString("0000-00-00'T'00:00:00");
         var endTime = LocalDateTime.parse(endDT, parser);
 
-        return new ScrimmageImpl(teams, location, region, applicationStatus, organizer, sizeLimit, startTime, endTime);
+        var returnScrim = new ScrimmageImpl(teams, location, region, applicationStatus, organizer, sizeLimit, startTime, endTime);
+
+        for (Team team : teams) {
+            team.attendeeFor(returnScrim);
+        }
+
+        return returnScrim;
     }
 
     /**
@@ -268,20 +272,31 @@ public class ScrimmageImpl implements Scrimmage {
     }
 
     @Override
+    public ObjectNode getLimitedONode(ObjectMapper oMapper) {
+        var oNode = oMapper.createObjectNode();
+        oNode.put("identifier", getIdentifier());
+        oNode.put("appStatus", applicationStatus.name());
+        oNode.putPOJO("location", location);
+        oNode.put("region", region.getRegionCode());
+        return oNode;
+    }
+
+    @Override
     public ObjectNode getONode(ObjectMapper oMapper) {
         var oNode = oMapper.createObjectNode();
         oNode.put("identifier", getIdentifier());
-        oNode.putPOJO("appStatus", applicationStatus);
+        oNode.put("appStatus", applicationStatus.name());
         oNode.putPOJO("location", location);
-        oNode.putPOJO("region", region);
+        oNode.put("region", region.getRegionCode());
         oNode.putPOJO("organizer", organizer.getLimitedONode(oMapper));
         var tempArrN = oMapper.createArrayNode();
         for (Team team : teams) {
             tempArrN.add(team.getLimitedONode(oMapper));
         };
         oNode.putIfAbsent("teams", tempArrN);
-        oNode.putPOJO("startTime", startTime);
-        oNode.putPOJO("endTime", endTime);
+        var parser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        oNode.put("startTime", startTime.format(parser));
+        oNode.putPOJO("endTime", endTime.format(parser));
         oNode.put("size", sizeLimit);
 
         return oNode;
@@ -295,25 +310,9 @@ public class ScrimmageImpl implements Scrimmage {
      */
     @Override
     public File saveToFile() throws IOException {
+        ObjectMapper om = new ObjectMapper();
         var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".txt";
-
-        try (var fileizer = new FileWriter(uri))
-        {
-            var startTimeString = startTime.getMinute() >= 30 ? startTime.plusHours(1).format(DateTimeFormatter.ofPattern("MM_dd_yyyy_HH")) : startTime.format(DateTimeFormatter.ofPattern("MM_dd_yyyy_HH"));
-            var endTimeString = endTime.getMinute() >= 30 ? endTime.plusHours(1).format(DateTimeFormatter.ofPattern("MM_dd_yyyy_HH")) : endTime.format(DateTimeFormatter.ofPattern("MM_dd_yyyy_HH"));
-
-            var string = teams.toString() + "\n" +
-                    location.address + "_" + location.city + "_" + location.state + "_" + location.country + "_" + location.latitude + "_" + location.longitude + "\n" +
-                    region.getRegionCode() + "\n" +
-                    applicationStatus.toString() + "\n" +
-                    organizer.getTeamNum() + "\n" +
-                    sizeLimit + "\n" +
-                    startTimeString + "\n" +
-                    endTimeString;
-            fileizer.write(string);
-        } catch (IOException e) {
-            throw new IOException(e);
-        }
+        om.writeValue(new File(uri), this.getONode(om));
         return new File(uri);
     }
 

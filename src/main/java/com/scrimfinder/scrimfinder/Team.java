@@ -1,7 +1,9 @@
 package com.scrimfinder.scrimfinder;
 
 import com.scrimfinder.EDC.*;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
@@ -25,10 +27,10 @@ public class Team {
     private final int teamNum;
     private final String teamName;
     private final Region region;
-    private ArrayList<Scrimmage> activeScrimmages;
-    private ArrayList<Scrimmage> organizedScrimmages;
+    private ArrayList<LimitedScrim> activeScrimmages;
+    private ArrayList<LimitedScrim> organizedScrimmages;
 
-    public static Team NULL_TEAM = new Team(0, "null", Region.NA);
+    public static Team NULL_TEAM = new Team(0, "N/A", Region.KNOWHERE);
 
     public int getTeamNum() {
         return teamNum;
@@ -42,15 +44,15 @@ public class Team {
         return teamName;
     }
 
-    public ArrayList<Scrimmage> getActiveScrimmages() {
+    public ArrayList<LimitedScrim> getActiveScrimmages() {
         return activeScrimmages;
     }
 
-    public ArrayList<Scrimmage> getOrganizedScrimmages() {
+    public ArrayList<LimitedScrim> getOrganizedScrimmages() {
         return organizedScrimmages;
     }
 
-    public Team(int tNum, String tName, Region reg, ArrayList<Scrimmage> aScrims, ArrayList<Scrimmage> oScrims) {
+    public Team(int tNum, String tName, Region reg, ArrayList<LimitedScrim> aScrims, ArrayList<LimitedScrim> oScrims) {
         teamNum = tNum;
         teamName = tName;
         region = reg;
@@ -69,55 +71,63 @@ public class Team {
     public Team(int tNum) {
         teamNum = tNum;
         teamName = "N/A";
-        region = Region.NA;
+        region = Region.KNOWHERE;
         activeScrimmages = new ArrayList<>();
         organizedScrimmages = new ArrayList<>();
     }
 
-    public Team(File file) throws FileNotFoundException {
-        StringBuilder stingerBuilder = new StringBuilder();
-        try (Scanner scammer = new Scanner(file)) {
-            while (scammer.hasNextLine()) {
-                stingerBuilder.append(scammer.nextLine()).append("\n");
-            }
+    public static Team of(File file) throws FileNotFoundException {
+        ObjectMapper oMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = oMapper.readTree(file);
+            return fromJNode(jsonNode);
+        } catch (IOException e) {
+            return NULL_TEAM;
+        }
+    }
+
+    private static Team fromJNode(JsonNode jsonNode) throws IOException {
+        var oMap = new ObjectMapper();
+
+        int teamNum = jsonNode.get("tNum").asInt(0);
+        String teamName = jsonNode.get("tName").asString("");
+        Region region = Region.fromCode(jsonNode.get("region").asString("KNOWHERE"));
+
+        ArrayNode arNo = jsonNode.get("activeScrims").asArray();
+        ArrayList<LimitedScrim> activeScrimmages = new ArrayList<>();
+        for (JsonNode node : arNo) {
+            activeScrimmages.add(LimitedScrim.fromJNode(node));
         }
 
-        var stinger = stingerBuilder.toString();
-        var stingerArray = stinger.split("\n");
-
-        this.teamNum = Integer.parseInt(stingerArray[0]);
-        this.teamName = stingerArray[1];
-        this.region = Region.fromCode(stingerArray[2]);
-
-        var scrimListString = stingerArray[3].substring(1, stingerArray[3].length() - 1);
-        activeScrimmages = new ArrayList<Scrimmage>();
-        if (!scrimListString.isBlank()) {
-            var scrimList = scrimListString.split(", ");
-            for (String scrim : scrimList) {
-                activeScrimmages.add(ScrimmageImpl.fromFile(new File(MainConstants.SCRIM_PATH + scrim + ".txt")));
-            }
+        arNo = jsonNode.get("organizedScrims").asArray();
+        ArrayList<LimitedScrim> organizedScrims = new ArrayList<>();
+        for (JsonNode node : arNo) {
+            organizedScrims.add(LimitedScrim.fromJNode(node));
         }
 
-        scrimListString = stingerArray[4].substring(1, stingerArray[4].length() - 1);
+        /*scrimListString = stingerArray[4].substring(1, stingerArray[4].length() - 1);
         organizedScrimmages = new ArrayList<Scrimmage>();
         if (!scrimListString.isBlank()) {
             var scrimList = scrimListString.split(", ");
             for (String scrim : scrimList) {
                 organizedScrimmages.add(ScrimmageImpl.fromFile(new File(MainConstants.SCRIM_PATH + scrim + ".txt")));
             }
-        }
+        }*/
+
+        var returnTeam = new Team(teamNum, teamName, region, activeScrimmages, organizedScrims);
+        return returnTeam;
     }
 
     public void attendeeFor(Scrimmage scrimmage) {
-        activeScrimmages.add(scrimmage);
+        activeScrimmages.add(new LimitedScrim(scrimmage));
     }
 
     public boolean notAttending(Scrimmage scrimmage) {
-        return activeScrimmages.remove(scrimmage);
+        return activeScrimmages.remove(new LimitedScrim(scrimmage));
     }
 
     public void organizerFor(Scrimmage scrimmage) {
-        organizedScrimmages.add(scrimmage);
+        organizedScrimmages.add(new LimitedScrim(scrimmage));
     }
 
     /**
@@ -125,21 +135,10 @@ public class Team {
      * saves team data in a file!
      */
     public File saveTeam() throws IOException {
-        try (FileWriter rwefrrn = new FileWriter(MainConstants.TEAM_PATH + teamNum + ".txt")) {
-            var writeString =
-                    teamNum + "\n" +
-                    teamName + "\n" +
-                    region.getRegionCode() + "\n" +
-                    activeScrimmages.toString() + "\n" +
-                    organizedScrimmages.toString();
-
-            rwefrrn.write(writeString);
-
-        } catch (IOException e) {
-            throw new IOException(e);
-        }
-
-        return new File(MainConstants.TEAM_PATH + teamNum + ".txt");
+        var oMap = new ObjectMapper();
+        var uri = MainConstants.TEAM_PATH + teamNum  + ".txt";
+        oMap.writeValue(new File(uri), this.getONode(oMap));
+        return new File(uri);
     }
 
     public ObjectNode getONode(ObjectMapper objectMapper) {
@@ -149,13 +148,13 @@ public class Team {
         oNode.put("tName", teamName);
         oNode.putPOJO("region", getRegion());
         var tempArrN = objectMapper.createArrayNode();
-        for (Scrimmage aScrim : activeScrimmages) {
+        for (LimitedScrim aScrim : activeScrimmages) {
             tempArrN.add(aScrim.getONode(objectMapper));
         }
         oNode.putIfAbsent("activeScrims", tempArrN);
 
-        tempArrN.removeAll();
-        for (Scrimmage aScrim : organizedScrimmages) {
+        tempArrN = objectMapper.createArrayNode();
+        for (LimitedScrim aScrim : organizedScrimmages) {
             tempArrN.add(aScrim.getONode(objectMapper));
         }
         oNode.putIfAbsent("organizedScrims", tempArrN);
