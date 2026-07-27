@@ -1,9 +1,9 @@
 package com.scrimfinder.EDC;
 
 public enum Region {
-    NORCAL("norcal"),
-    SOCAL("socal"),
-    NA("N/A");
+    NORCAL("NORCAL"),
+    SOCAL("SOCAL"),
+    KNOWHERE("KNOWHERE");
 
     //todo: add more places you chud this is SILLY
 
@@ -14,10 +14,10 @@ public enum Region {
 
     public static Region fromCode(String code) {
         return switch (code) {
-            case "norcal" -> NORCAL;
-            case "socal" -> SOCAL;
-            case "NA" -> NA;
-            case null, default -> NA;
+            case "NORCAL" -> NORCAL;
+            case "SOCAL" -> SOCAL;
+            case "KNOWHERE" -> KNOWHERE;
+            case null, default -> KNOWHERE;
         };
     }
 

@@ -1,5 +1,7 @@
 package com.scrimfinder.EDC;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * A location on Earth!<p>
  * Has a<br>
@@ -11,7 +13,8 @@ package com.scrimfinder.EDC;
  * Country
  */
 public class Location {
-    public final double longitude;
+    @JsonProperty("longitude")
+    public final double longitude; //todo: make into a littol list?!??! vector??!!?
     public final double latitude;
     public final String address;
     public final String city;

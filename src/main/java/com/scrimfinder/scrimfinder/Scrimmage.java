@@ -114,6 +114,8 @@ public interface Scrimmage {
      */
     public boolean hasTeam(Team t);
 
+    ObjectNode getLimitedONode(ObjectMapper oMapper);
+
     ObjectNode getONode(ObjectMapper oMapper);
 
     /**

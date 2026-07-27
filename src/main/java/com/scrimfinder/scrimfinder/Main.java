@@ -39,6 +39,7 @@ public class Main implements AutoCloseable{
         for (Team team : scrim.teamsInScrim()) {
             teams.add(team);
         }
+
         saveScrims();
         saveTeams();
         return true;
@@ -52,7 +53,8 @@ public class Main implements AutoCloseable{
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Path.of(MainConstants.SCRIM_PATH))) {
             scrims.clear();
             stream.forEach(path -> {
-                scrims.add(ScrimmageImpl.fromFile(new File(path.toUri())));
+                var scrim = ScrimmageImpl.fromFile(new File(path.toUri()));
+                scrims.add(scrim);
             });
             return true;
         } finally {
@@ -68,7 +70,8 @@ public class Main implements AutoCloseable{
         teams.clear();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Path.of(MainConstants.TEAM_PATH))) {
             for (Path path : stream) {
-                teams.add(new Team(new File(path.toUri())));
+                var team = Team.of(new File(path.toUri()));
+                teams.add(team);
             }
             return true;
         } finally {
