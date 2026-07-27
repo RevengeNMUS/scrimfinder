@@ -1,45 +1,76 @@
 package com.scrimfinder.scrimfinder;
 
 import com.scrimfinder.SearchMethods.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
 
 @RestController
 @SpringBootApplication
 public class ServerRunner {
-    Main main = new Main();
+    Main main;
+    ObjectMapper oMapper;
 
-    public ServerRunner(Main m) {
+    @Autowired
+    public ServerRunner(ObjectMapper objectMapper, Main m) {
+        oMapper = objectMapper;
         main = m;
     }
     @RequestMapping(value = "/getScrims", method = RequestMethod.GET)
-    String getScrims() {
+    ResponseEntity<JsonNode> getScrims() {
         try {
-            StringBuilder returnString = new StringBuilder();
-            var scrimList = main.findScrims(ScrimSearch.ALWAYS_FOUND);
-            for (Scrimmage scrim : scrimList) {
-                returnString.append(getScrimInfo(scrim)).append("<br>");
+            var arNode = oMapper.createArrayNode();
+            for (ScrimmageImpl scrim : main.findScrims(ScrimSearch.ALWAYS_FOUND)) {
+                arNode.add(scrim.getONode(oMapper));
             }
-            return returnString.toString();
+
+            return ResponseEntity.ok(arNode);
         } catch (ResourceNotFoundException e) {
-            return new RuntimeException(e).getMessage();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     @RequestMapping(value = "/getTeams", method = RequestMethod.GET)
-    String getTeams() {
+    ResponseEntity<JsonNode> getTeams() {
+        try {
+            var arNode = oMapper.createArrayNode();
+            for (Team team : main.findTeams(TeamSearch.ALWAYS_FOUND)) {
+                arNode.add(team.getONode(oMapper));
+            }
+
+            return ResponseEntity.ok(arNode);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @RequestMapping(value = "/getTeam/{id}", method = RequestMethod.GET)
+    public ResponseEntity<JsonNode> getTeam(@PathVariable int id) {
         try {
             StringBuilder returnString = new StringBuilder();
-            var teamList = main.findTeams(TeamSearch.ALWAYS_FOUND);
-            for (Team team : teamList) {
-                returnString.append(getTeamInfo(team)).append("<br>");
-            }
-            return returnString.toString();
+            Team team = main.findTeams(new TeamSearch() {
+                @Override
+                public boolean isFound(Team team) {
+                    return team.getTeamNum() == id;
+                }
+
+                @Override
+                public String finderMethod() {
+                    return "team equality";
+                }
+            }).get(0); //slop but get owned ig
+            return ResponseEntity.ok(team.getONode(oMapper));
         } catch (ResourceNotFoundException e) {
-            return new RuntimeException(e).getMessage();
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -56,35 +87,5 @@ public class ServerRunner {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static String getScrimInfo(Scrimmage scrim) {
-        StringBuilder tempString = new StringBuilder();
-        for (Team team : scrim.teamsInScrim()) {
-            tempString.append(team.getTeamNum()).append(", ");
-        }
-
-        return
-        "<p>" +
-        (scrim.getIdentifier()) + "<br>" +
-        "&emsp;" + scrim.regionOfScrim() + "<br>" +
-        "&emsp;" + scrim.locationOfScrim() + "<br>" +
-        "&emsp;" + scrim.appStatus() + "<br>" +
-        "&emsp;" + scrim.startTime()  + "<br>" +
-        "&emsp;" + scrim.endTime()  + "<br>" +
-        "&emsp;" + scrim.isFull() + "<br>" +
-        "&emsp;" + scrim.scrimOrganizer()  + "<br>" +
-        "&emsp;{" + tempString + "}" +
-        "</p>";
-    }
-
-    private static String getTeamInfo(Team team) {
-        return
-        "<p>" +
-        (team.getTeamNum()) + ":" + (team.getTeamName()) + "<br>" +
-        "&emsp;" + team.getActiveScrimmages()  + "<br>" +
-        "&emsp;" + team.getOrganizedScrimmages() + "<br>" +
-        "&emsp;" + (team.getRegion()) +
-        "</p>";
     }
 }

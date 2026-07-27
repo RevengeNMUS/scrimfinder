@@ -1,6 +1,9 @@
 package com.scrimfinder.scrimfinder;
 
 import com.scrimfinder.EDC.*;
+import tools.jackson.core.JsonPointer;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -22,14 +25,14 @@ import java.util.Scanner;
 public class ScrimmageImpl implements Scrimmage {
     public static final ScrimmageImpl NULL_SCRIM = new ScrimmageImpl(new ArrayList<>(), Location.NULL_LOCATION, Region.NA, ApplicationStatus.CLOSED, Team.NULL_TEAM, 0, LocalDateTime.of(0, 1, 1, 0, 0), LocalDateTime.of(0, 1, 1, 0, 0));
 
-    private ArrayList<Team> teams;
-    private Location location;
-    private Region region;
-    private ApplicationStatus applicationStatus;
-    private Team organizer;
-    private int sizeLimit;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    public ArrayList<Team> teams;
+    public Location location;
+    public Region region;
+    public ApplicationStatus applicationStatus;
+    public Team organizer;
+    public int sizeLimit;
+    public LocalDateTime startTime;
+    public LocalDateTime endTime;
 
     public ScrimmageImpl(ArrayList<Team> teams, Location location, Region region, ApplicationStatus applicationStatus, Team organizer, int sizeLimit, LocalDateTime startTime, LocalDateTime endTime) {
         this.teams = teams;
@@ -262,6 +265,26 @@ public class ScrimmageImpl implements Scrimmage {
     public String getIdentifier() {
         var identifier = organizer.getTeamNum() + "-" + location.city + "-" + startTime.format(DateTimeFormatter.ofPattern("dd_MM_yyyy"));
         return identifier;
+    }
+
+    @Override
+    public ObjectNode getONode(ObjectMapper oMapper) {
+        var oNode = oMapper.createObjectNode();
+        oNode.put("identifier", getIdentifier());
+        oNode.putPOJO("appStatus", applicationStatus);
+        oNode.putPOJO("location", location);
+        oNode.putPOJO("region", region);
+        oNode.putPOJO("organizer", organizer.getLimitedONode(oMapper));
+        var tempArrN = oMapper.createArrayNode();
+        for (Team team : teams) {
+            tempArrN.add(team.getLimitedONode(oMapper));
+        };
+        oNode.putIfAbsent("teams", tempArrN);
+        oNode.putPOJO("startTime", startTime);
+        oNode.putPOJO("endTime", endTime);
+        oNode.put("size", sizeLimit);
+
+        return oNode;
     }
 
     /**

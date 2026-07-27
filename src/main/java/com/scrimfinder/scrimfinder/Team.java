@@ -1,6 +1,8 @@
 package com.scrimfinder.scrimfinder;
 
 import com.scrimfinder.EDC.*;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -138,6 +140,35 @@ public class Team {
         }
 
         return new File(MainConstants.TEAM_PATH + teamNum + ".txt");
+    }
+
+    public ObjectNode getONode(ObjectMapper objectMapper) {
+        var oNode = objectMapper.createObjectNode();
+
+        oNode.put("tNum", teamNum);
+        oNode.put("tName", teamName);
+        oNode.putPOJO("region", getRegion());
+        var tempArrN = objectMapper.createArrayNode();
+        for (Scrimmage aScrim : activeScrimmages) {
+            tempArrN.add(aScrim.getONode(objectMapper));
+        }
+        oNode.putIfAbsent("activeScrims", tempArrN);
+
+        tempArrN.removeAll();
+        for (Scrimmage aScrim : organizedScrimmages) {
+            tempArrN.add(aScrim.getONode(objectMapper));
+        }
+        oNode.putIfAbsent("organizedScrims", tempArrN);
+
+        return oNode;
+    }
+
+    public ObjectNode getLimitedONode(ObjectMapper objectMapper) {
+        var tNode = objectMapper.createObjectNode();
+        tNode.putPOJO("teamName", getTeamName());
+        tNode.putPOJO("teamNum", getTeamNum());
+        tNode.putPOJO("region", getRegion());
+        return tNode;
     }
 
     @Override

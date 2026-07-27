@@ -144,12 +144,12 @@ public class Main implements AutoCloseable{
         return returnList;
     }
 
-    public ArrayList<Scrimmage> findScrims(ScrimSearch ss) throws ResourceNotFoundException {
-        var returnList = new ArrayList<Scrimmage>();
+    public ArrayList<ScrimmageImpl> findScrims(ScrimSearch ss) throws ResourceNotFoundException {
+        var returnList = new ArrayList<ScrimmageImpl>();
 
         for (Scrimmage scrim : scrims) {
             if (ss.isFound(scrim)) {
-                returnList.add(scrim);
+                returnList.add((ScrimmageImpl) scrim); //SUCH SLOP OMG anweuifawuekfuawuilefkjhawilefjio
             }
         }
 
