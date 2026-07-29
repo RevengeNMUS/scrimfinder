@@ -16,7 +16,7 @@ public enum ApplicationStatus {
         return switch (statusString) {
             case "OPEN" -> OPEN;
             case "CLOSED" -> CLOSED;
-            case null, default -> CLOSED;
+            case null, default -> null;
         };
     }
 

@@ -1,18 +1,27 @@
 package com.scrimfinder.scrimfinder;
 
+import com.scrimfinder.EDC.ApplicationStatus;
+import com.scrimfinder.EDC.Region;
 import com.scrimfinder.SearchMethods.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeoutException;
+
+import static com.scrimfinder.SearchMethods.SearchFactory.PARSER;
 
 @RestController
 @SpringBootApplication
@@ -21,25 +30,99 @@ public class ServerRunner {
     ObjectMapper oMapper;
 
     @Autowired
-    public ServerRunner(ObjectMapper objectMapper, Main m) {
+    public ServerRunner(ObjectMapper objectMapper, Main m) throws IOException, InterruptedException, TimeoutException {
         oMapper = objectMapper;
         main = m;
+        main.loadTeams();
+        main.loadScrims();
     }
+
+    /*
+    🛏️🛏️🛏️🛌🛌🛌😴😴😴
+     */
     @RequestMapping(value = "/getScrims", method = RequestMethod.GET)
-    ResponseEntity<JsonNode> getScrims() {
+    ResponseEntity<JsonNode> getScrims(
+            @RequestParam(value = "identifier", required = false) String identifier,
+            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "sDatetime", required = false) String sdatetime,
+            @RequestParam(value = "eDatetime", required = false) String edatetime,
+            @RequestParam(value = "date", required = false) String date,
+            @RequestParam(value = "teamInScrim", required = false) String teamInScrim,
+            @RequestParam(value = "appStatus", required = false) String appStatus)
+            //add loc?
+    {
         try {
+            var fullList = main.findScrims(SearchFactory.SCRIM_DEFAULT);
+            Region reg = region != null ? Region.valueOf(region) : null;
+            var regionList = Main.findScrims(fullList, SearchFactory.buildScrimSearch(reg));
+
+            LocalDateTime sdt = null;
+            LocalDateTime edt = null;
+            if (!(sdatetime == null && edatetime == null)) {
+                sdt = sdatetime != null ? LocalDateTime.parse(sdatetime, PARSER) : LocalDateTime.of(1,1,1,1,1);
+                edt = edatetime != null ? LocalDateTime.parse(edatetime, PARSER) : LocalDateTime.of(3000,12,31,23,59);
+            }
+            var rangedList = Main.findScrims(regionList, SearchFactory.buildScrimSearch(sdt, edt));
+
+            LocalDate ld = date != null ? LocalDateTime.parse(date, PARSER).toLocalDate() : null;
+            var datedList = Main.findScrims(rangedList, SearchFactory.buildScrimSearch(ld));
+
+            Team team = teamInScrim != null ? new Team(Integer.parseInt(teamInScrim)) : null;
+            var teamList = Main.findScrims(datedList, SearchFactory.buildScrimSearch(team));
+
+            var identifierList = Main.findScrims(teamList, SearchFactory.buildScrimSearch(identifier));
+
+            var fullyFilteredList = Main.findScrims(identifierList, SearchFactory.buildScrimSearch(ApplicationStatus.fromStatusString(appStatus)));
+
             var arNode = oMapper.createArrayNode();
-            for (ScrimmageImpl scrim : main.findScrims(ScrimSearch.ALWAYS_FOUND)) {
+            for (Scrimmage scrim : fullyFilteredList) {
                 arNode.add(scrim.getONode(oMapper));
             }
 
             return ResponseEntity.ok(arNode);
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).build();
         }
     }
 
     @RequestMapping(value = "/getTeams", method = RequestMethod.GET)
+    ResponseEntity<JsonNode> getTeams(
+            @RequestParam(value = "tNumber", required = false) String tNum,
+            @RequestParam(value = "tName", required = false) String tName,
+            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "oScrim", required = false) String oScrim,
+            @RequestParam(value = "aScrim", required = false) String aScrim)
+    {
+        try {
+            main.saveTeams();
+
+            var fullList = main.findTeams(SearchFactory.TEAM_DEFAULT);
+            Region reg = region != null ? Region.valueOf(region) : null;
+            var regionList = Main.findTeams(fullList, SearchFactory.buildTeamSearch(reg));
+            Integer team = tNum != null ? Integer.parseInt(tNum) : null;
+            var numberedList = Main.findTeams(regionList, SearchFactory.buildTeamSearch(team));
+            var namedList = Main.findTeams(numberedList, SearchFactory.buildTeamSearch(tName));
+            var oScrimmedList  = Main.findTeams(namedList, SearchFactory.buildTeamSearch(oScrim, true));
+            var fullFilterList = Main.findTeams(oScrimmedList, SearchFactory.buildTeamSearch(aScrim, false));
+
+            var arNode = oMapper.createArrayNode();
+            for (Team scrim : fullFilterList) {
+                arNode.add(scrim.getONode(oMapper));
+            }
+
+            return ResponseEntity.ok(arNode);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).build();
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
+        } catch (InterruptedException e) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
+        }
+    }
+
+    /*@RequestMapping(value = "/getTeams", method = RequestMethod.GET)
     ResponseEntity<JsonNode> getTeams() {
         try {
             var arNode = oMapper.createArrayNode();
@@ -51,7 +134,7 @@ public class ServerRunner {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.internalServerError().build();
         }
-    }
+    }*/
 
     @RequestMapping(value = "/getTeam/{id}", method = RequestMethod.GET)
     public ResponseEntity<JsonNode> getTeam(@PathVariable int id) {
@@ -79,10 +162,36 @@ public class ServerRunner {
         return "Explodes mind with MIND";
     }
 
+    @RequestMapping(value = "/error", method = RequestMethod.GET)
+    ResponseEntity<byte[]> error() {
+        try {
+            Path path = Paths.get("src/main/resources/plsnolook/cope.png");
+            byte[] imageBytes = Files.readAllBytes(path);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG) // Changes to IMAGE_PNG if needed
+                    .body(imageBytes);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @RequestMapping(value = "/wSpeed")
+    ResponseEntity<byte[]> wSpeed() {
+        try {
+            Path path = Paths.get("src/main/resources/plsnolook/wspeed.png");
+            byte[] imageBytes = Files.readAllBytes(path);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG) // Changes to IMAGE_PNG if needed
+                    .body(imageBytes);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     public static void main(String[] args) {
         try (var main = new Main()) {
-            main.loadTeams();
-            main.loadScrims();
             SpringApplication.run(ServerRunner.class, args);
         } catch (Exception e) {
             throw new RuntimeException(e);

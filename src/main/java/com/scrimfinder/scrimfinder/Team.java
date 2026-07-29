@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.function.IntPredicate;
+import java.util.function.ToIntFunction;
+import java.util.stream.Stream;
 
 /**
  * A Team! <p>
@@ -27,8 +30,8 @@ public class Team {
     private final int teamNum;
     private final String teamName;
     private final Region region;
-    private ArrayList<LimitedScrim> activeScrimmages;
-    private ArrayList<LimitedScrim> organizedScrimmages;
+    private final ArrayList<LimitedScrim> activeScrimmages;
+    private final ArrayList<LimitedScrim> organizedScrimmages;
 
     public static Team NULL_TEAM = new Team(0, "N/A", Region.KNOWHERE);
 
@@ -87,8 +90,6 @@ public class Team {
     }
 
     private static Team fromJNode(JsonNode jsonNode) throws IOException {
-        var oMap = new ObjectMapper();
-
         int teamNum = jsonNode.get("tNum").asInt(0);
         String teamName = jsonNode.get("tName").asString("");
         Region region = Region.fromCode(jsonNode.get("region").asString("KNOWHERE"));
@@ -116,6 +117,21 @@ public class Team {
 
         var returnTeam = new Team(teamNum, teamName, region, activeScrimmages, organizedScrims);
         return returnTeam;
+    }
+
+    public boolean isAttending(String scrimmage) {
+        return activeScrimmages.stream().map(
+                limitedScrim -> limitedScrim.identifier
+        ).anyMatch(
+                s -> s.equals(scrimmage)
+        ) || isOrganizing(scrimmage);
+    }
+    public boolean isOrganizing(String scrimmage) {
+        return organizedScrimmages.stream().map(
+            limitedScrim -> limitedScrim.identifier
+        ).anyMatch(
+            s -> s.equals(scrimmage)
+        );
     }
 
     public void attendeeFor(Scrimmage scrimmage) {

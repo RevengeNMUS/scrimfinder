@@ -130,6 +130,22 @@ public class Main implements AutoCloseable{
         throw new ResourceNotFoundException("Resource not found for team name " + tName);
     }
 
+    public static ArrayList<Team> findTeams(ArrayList<Team> teams, TeamSearch ts) throws ResourceNotFoundException {
+        var returnList = new ArrayList<Team>();
+        for (Team team : teams) {
+            if (ts.isFound(team)) {
+                returnList.add(team);
+            }
+        }
+
+        if (returnList.isEmpty()) {
+            //resort to throwing rotten tomatoes (exception) at user
+            throw new ResourceNotFoundException("No resources found for  " + ts.finderMethod());
+        }
+
+        return returnList;
+    }
+
     public ArrayList<Team> findTeams(TeamSearch ts) throws ResourceNotFoundException {
         var returnList = new ArrayList<Team>();
 
@@ -147,7 +163,26 @@ public class Main implements AutoCloseable{
         return returnList;
     }
 
+
+
     public ArrayList<ScrimmageImpl> findScrims(ScrimSearch ss) throws ResourceNotFoundException {
+        var returnList = new ArrayList<ScrimmageImpl>();
+
+        for (Scrimmage scrim : scrims) {
+            if (ss.isFound(scrim)) {
+                returnList.add((ScrimmageImpl) scrim); //SUCH SLOP OMG anweuifawuekfuawuilefkjhawilefjio
+            }
+        }
+
+        if (returnList.isEmpty()) {
+            //resort to throwing rotten tomatoes (exception) at user
+            throw new ResourceNotFoundException("No resources found for  " + ss.finderMethod());
+        }
+
+        return returnList;
+    }
+
+    public static ArrayList<ScrimmageImpl> findScrims(ArrayList<ScrimmageImpl> scrims, ScrimSearch ss) throws ResourceNotFoundException {
         var returnList = new ArrayList<ScrimmageImpl>();
 
         for (Scrimmage scrim : scrims) {
