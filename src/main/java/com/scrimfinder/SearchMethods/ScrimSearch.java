@@ -13,19 +13,7 @@ import com.scrimfinder.scrimfinder.Scrimmage;
  * Look at findTeams to learn more (not a pyramid scheme)
  */
 public interface ScrimSearch {
-    public static ScrimSearch ALWAYS_FOUND = new ScrimSearch () {
-        @Override
-        public boolean isFound(Scrimmage scrimmage) {
-            return true;
-        }
-
-        @Override
-        public String finderMethod() {
-            return "always found";
-        }
-    };
-
-    public boolean isFound(Scrimmage team);
+        public boolean isFound(Scrimmage scrim);
 
     public String finderMethod();
 }

@@ -96,8 +96,8 @@ public class SavingTesters {
 
         for (Scrimmage scrim : mane.findScrims(new ScrimSearch() {
             @Override
-            public boolean isFound(Scrimmage team) {
-                return team.regionOfScrim() == Region.NORCAL;
+            public boolean isFound(Scrimmage scrim) {
+                return scrim.regionOfScrim() == Region.NORCAL;
             }
 
             @Override
@@ -112,8 +112,8 @@ public class SavingTesters {
 
         for (Scrimmage scrim : mane.findScrims(new ScrimSearch() {
             @Override
-            public boolean isFound(Scrimmage team) {
-                return team.regionOfScrim() == Region.SOCAL;
+            public boolean isFound(Scrimmage scrim) {
+                return scrim.regionOfScrim() == Region.SOCAL;
             }
 
             @Override

@@ -57,6 +57,12 @@ public class Location {
         return state;
     }
 
+    public static Location parseLocation(String loc) {
+        return NULL_LOCATION;
+        //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        //i aint coding all that twin ✌️
+    }
+
     @Override
     public String toString() {
         return "Location{" +

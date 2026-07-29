@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.function.IntPredicate;
+import java.util.function.ToIntFunction;
 
 
 /**
@@ -74,7 +76,7 @@ public class ScrimmageImpl implements Scrimmage {
         var locNode = jsonNode.get("location");
         var location = new Location(locNode.get("longitude").asDouble(0.0), locNode.get("latitude").asDouble(0.0), locNode.get("address").asString(" "), locNode.get("city").asString(" "), locNode.get("state").asString(" "), locNode.get("country").asString(" "));
 
-        var region = Region.fromCode(jsonNode.get("region").asString("KNOWHERE"));
+        var region = Region.fromCode(jsonNode.get("region").asString());
 
         var applicationStatus = ApplicationStatus.valueOf(jsonNode.get("appStatus").asString("CLOSED"));
 
@@ -262,7 +264,17 @@ public class ScrimmageImpl implements Scrimmage {
      */
     @Override
     public boolean hasTeam(Team t) {
-        return teams.contains(t);
+        return teams.stream().mapToInt(new ToIntFunction<Team>() {
+            @Override
+            public int applyAsInt(Team value) {
+                return value.getTeamNum();
+            }
+        }).anyMatch(new IntPredicate() {
+            @Override
+            public boolean test(int value) {
+                return value == t.getTeamNum();
+            }
+        });
     }
 
     @Override
