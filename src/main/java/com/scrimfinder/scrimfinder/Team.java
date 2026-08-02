@@ -8,14 +8,9 @@ import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Scanner;
-import java.util.function.IntPredicate;
-import java.util.function.ToIntFunction;
-import java.util.stream.Stream;
 
 /**
  * A Team! <p>
@@ -89,7 +84,7 @@ public class Team {
         }
     }
 
-    private static Team fromJNode(JsonNode jsonNode) throws IOException {
+    public static Team fromJNode(JsonNode jsonNode) throws IOException {
         int teamNum = jsonNode.get("tNum").asInt(0);
         String teamName = jsonNode.get("tName").asString("");
         Region region = Region.fromCode(jsonNode.get("region").asString("KNOWHERE"));
@@ -115,8 +110,7 @@ public class Team {
             }
         }*/
 
-        var returnTeam = new Team(teamNum, teamName, region, activeScrimmages, organizedScrims);
-        return returnTeam;
+        return new Team(teamNum, teamName, region, activeScrimmages, organizedScrims);
     }
 
     public boolean isAttending(String scrimmage) {
@@ -134,23 +128,28 @@ public class Team {
         );
     }
 
-    public void attendeeFor(Scrimmage scrimmage) {
-        activeScrimmages.add(new LimitedScrim(scrimmage));
+    public boolean attendeeFor(LimitedScrim scrimmage) {
+        if (!activeScrimmages.contains(scrimmage)) {
+            activeScrimmages.add(scrimmage);
+            return true;
+        }
+
+        return false;
     }
 
-    public boolean notAttending(Scrimmage scrimmage) {
-        return activeScrimmages.remove(new LimitedScrim(scrimmage));
+    public boolean notAttending(LimitedScrim scrimmage) {
+        return activeScrimmages.remove(scrimmage);
     }
 
-    public void organizerFor(Scrimmage scrimmage) {
-        organizedScrimmages.add(new LimitedScrim(scrimmage));
+    public void organizerFor(LimitedScrim scrimmage) {
+        organizedScrimmages.add(scrimmage);
     }
 
     /**
      * IMPLIMENT IT YOUBHB KJSGFVSG<FU
      * saves team data in a file!
      */
-    public File saveTeam() throws IOException {
+    public File saveToFile() throws IOException {
         var oMap = new ObjectMapper();
         var uri = MainConstants.TEAM_PATH + teamNum  + ".txt";
         oMap.writeValue(new File(uri), this.getONode(oMap));

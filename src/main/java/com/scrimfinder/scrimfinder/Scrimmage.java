@@ -131,4 +131,9 @@ public interface Scrimmage {
      * we are screwed
      */
     public String getIdentifier();
+
+    /**
+     * e
+     */
+    public LimitedScrim toLimitedScrim();
 }

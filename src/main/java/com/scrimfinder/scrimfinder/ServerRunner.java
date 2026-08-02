@@ -33,8 +33,31 @@ public class ServerRunner {
     public ServerRunner(ObjectMapper objectMapper, Main m) throws IOException, InterruptedException, TimeoutException {
         oMapper = objectMapper;
         main = m;
-        main.loadTeams();
-        main.loadScrims();
+    }
+
+    @RequestMapping(value = "/createTeam", method = RequestMethod.POST)
+    ResponseEntity<Boolean> createTeam(@RequestBody JsonNode jNode) {
+        try {
+            var team = Team.fromJNode(jNode);
+            team.saveToFile();
+        } catch (IOException e) {
+            return ResponseEntity.status(418).build();
+        }
+
+        return ResponseEntity.ok(true);
+    }
+
+
+    @RequestMapping(value = "/createScrim", method = RequestMethod.POST)
+    ResponseEntity<Boolean> createScrim(@RequestBody JsonNode jNode) {
+        try {
+            var scrim = ScrimmageImpl.fromJNode(jNode);
+            scrim.saveToFile();
+        } catch (IOException e) {
+            return ResponseEntity.status(418).build();
+        }
+
+        return ResponseEntity.ok(true);
     }
 
     /*
@@ -113,11 +136,7 @@ public class ServerRunner {
             return ResponseEntity.ok(arNode);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).build();
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
-        } catch (TimeoutException e) {
-            return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException | TimeoutException e) {
             return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
         }
     }
@@ -150,7 +169,7 @@ public class ServerRunner {
                 public String finderMethod() {
                     return "team equality";
                 }
-            }).get(0); //slop but get owned ig
+            }).getFirst(); //slop but get owned ig
             return ResponseEntity.ok(team.getONode(oMapper));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -162,20 +181,23 @@ public class ServerRunner {
         return "Explodes mind with MIND";
     }
 
-    @RequestMapping(value = "/error", method = RequestMethod.GET)
+/*
+    @RequestMapping(value = "/error")
     ResponseEntity<byte[]> error() {
         try {
             Path path = Paths.get("src/main/resources/plsnolook/cope.png");
             byte[] imageBytes = Files.readAllBytes(path);
 
             return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG) // Changes to IMAGE_PNG if needed
+                    .contentType(MediaType.IMAGE_PNG)
                     .body(imageBytes);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+TS CODE EMBARRESED ME INFRONT OF A META DEV AIFHEiuAFNHEOEFBouoIAEFbuhEHfiWPFEHu
+*/
     @RequestMapping(value = "/wSpeed")
     ResponseEntity<byte[]> wSpeed() {
         try {
@@ -183,7 +205,7 @@ public class ServerRunner {
             byte[] imageBytes = Files.readAllBytes(path);
 
             return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG) // Changes to IMAGE_PNG if needed
+                    .contentType(MediaType.IMAGE_PNG)
                     .body(imageBytes);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();

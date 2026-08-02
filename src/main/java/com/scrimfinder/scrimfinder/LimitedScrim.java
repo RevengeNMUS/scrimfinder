@@ -8,15 +8,15 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Objects;
 
 public class LimitedScrim {
     public static final com.scrimfinder.scrimfinder.ScrimmageImpl NULL_SCRIM = new com.scrimfinder.scrimfinder.ScrimmageImpl(new ArrayList<>(), Location.NULL_LOCATION, Region.KNOWHERE, ApplicationStatus.CLOSED, Team.NULL_TEAM, 0, LocalDateTime.of(0, 1, 1, 0, 0), LocalDateTime.of(0, 1, 1, 0, 0));
+    private static final DateTimeFormatter parser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public String identifier;
     public Location location;
@@ -49,13 +49,10 @@ public class LimitedScrim {
         var region = Region.fromCode(jsonNode.get("region").asString("KNOWHERE"));
         var applicationStatus = ApplicationStatus.valueOf(jsonNode.get("appStatus").asString("CLOSED"));
 
-        var parser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         var startDT = jsonNode.get("startTime").asString("0000-00-00'T'00:00:00");
         var startTime = LocalDateTime.parse(startDT, parser);
 
-        var returnScrim = new LimitedScrim(identifier, location, region, applicationStatus, startTime);
-
-        return returnScrim;
+        return new LimitedScrim(identifier, location, region, applicationStatus, startTime);
     }
 
     /**
@@ -69,8 +66,6 @@ public class LimitedScrim {
 
     /**
      * Sets the Location for the event
-     *
-     * @param location
      */
     public void setLocation(Location location) {
         this.location = location;
@@ -78,8 +73,6 @@ public class LimitedScrim {
 
     /**
      * Sets the Region for the event
-     *
-     * @param region
      */
     public void setRegion(Region region) {
         this.region = region;
@@ -87,8 +80,6 @@ public class LimitedScrim {
 
     /**
      * Sets the ApplicationStatus for the event
-     *
-     * @param appStatus
      */
     public void setApplicationStatus(ApplicationStatus appStatus) {
         this.applicationStatus = appStatus;
@@ -148,5 +139,16 @@ public class LimitedScrim {
 
     public String toString() {
         return getIdentifier();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof LimitedScrim that)) return false;
+        return Objects.equals(identifier, that.identifier) && Objects.equals(location, that.location) && region == that.region && applicationStatus == that.applicationStatus && Objects.equals(startTime, that.startTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, location, region, applicationStatus, startTime);
     }
 }
