@@ -29,15 +29,44 @@ public class Main implements AutoCloseable{
     }
 
     public boolean addTeam(Team team) throws IOException, InterruptedException, TimeoutException {
-        teams.add(team);
+        if (!teams.contains(team)) {
+            teams.add(team);
+        }
+
         saveTeams();
         return true;
     }
 
     public boolean addScrim(Scrimmage scrim) throws IOException, InterruptedException, TimeoutException {
-        scrims.add(scrim);
+        if (!scrims.contains(scrim)) {
+            scrims.add(scrim);
+        }
         for (Team team : scrim.teamsInScrim()) {
-            teams.add(team);
+            if (!teams.contains(team)) {
+                teams.add(team);
+            }
+            team.attendeeFor(scrim.toLimitedScrim());
+        }
+
+        saveScrims();
+        saveTeams();
+        return true;
+    }
+
+    public boolean updateScrim(Scrimmage scrim, Scrimmage updatedScrim) throws IOException, InterruptedException, TimeoutException {
+        if (!scrims.contains(scrim)) {
+            throw new ResourceNotFoundException();
+        }
+
+        scrims.remove(scrim);
+        scrims.add(updatedScrim);
+
+        for (Team team : scrim.teamsInScrim()) {
+            team.notAttending(scrim.toLimitedScrim());
+        }
+
+        for (Team team : updatedScrim.teamsInScrim()) {
+            team.attendeeFor(updatedScrim.toLimitedScrim());
         }
 
         saveScrims();
@@ -101,7 +130,7 @@ public class Main implements AutoCloseable{
         }
         try {
             for (Team team : teams) {
-                team.saveTeam();
+                team.saveToFile();
             }
         } finally {
             rwlock.unlock();
@@ -147,20 +176,7 @@ public class Main implements AutoCloseable{
     }
 
     public ArrayList<Team> findTeams(TeamSearch ts) throws ResourceNotFoundException {
-        var returnList = new ArrayList<Team>();
-
-        for (Team team : teams) {
-            if (ts.isFound(team)) {
-                returnList.add(team);
-            }
-        }
-
-        if (returnList.isEmpty()) {
-            //resort to throwing rotten tomatoes (exception) at user
-            throw new ResourceNotFoundException("No resources found for  " + ts.finderMethod());
-        }
-
-        return returnList;
+        return findTeams(teams, ts);
     }
 
 
@@ -185,9 +201,9 @@ public class Main implements AutoCloseable{
     public static ArrayList<ScrimmageImpl> findScrims(ArrayList<ScrimmageImpl> scrims, ScrimSearch ss) throws ResourceNotFoundException {
         var returnList = new ArrayList<ScrimmageImpl>();
 
-        for (Scrimmage scrim : scrims) {
+        for (ScrimmageImpl scrim : scrims) {
             if (ss.isFound(scrim)) {
-                returnList.add((ScrimmageImpl) scrim); //SUCH SLOP OMG anweuifawuekfuawuilefkjhawilefjio
+                returnList.add(scrim); //SUCH SLOP OMG anweuifawuekfuawuilefkjhawilefjio
             }
         }
 
@@ -200,7 +216,7 @@ public class Main implements AutoCloseable{
     }
 
     public boolean joinScrim(Team team, Scrimmage scrim) throws IOException, InterruptedException, TimeoutException {
-        team.attendeeFor(scrim);
+        team.attendeeFor(scrim.toLimitedScrim());
         scrim.addTeam(team);
         //if smth dies, it dies HERE :000
         saveTeams();
@@ -209,7 +225,7 @@ public class Main implements AutoCloseable{
     }
 
     public boolean leaveScrim(Team team, Scrimmage scrim) throws IOException, InterruptedException, TimeoutException {
-        team.notAttending(scrim);
+        team.notAttending(scrim.toLimitedScrim());
         scrim.removeTeam(team);
         //if smth dies, it dies HERE :000
         saveTeams();

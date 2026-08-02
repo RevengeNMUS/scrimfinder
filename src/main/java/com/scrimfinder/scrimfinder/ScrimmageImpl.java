@@ -9,7 +9,6 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.function.IntPredicate;
 import java.util.function.ToIntFunction;
 
@@ -50,15 +49,9 @@ public class ScrimmageImpl implements Scrimmage {
 
     public static ScrimmageImpl fromFile(File file) {
         ObjectMapper oMapper = new ObjectMapper();
-        String fileString;
         //todo impl it actually maybe :0
-        try (Scanner reeder = new Scanner(file)) {
-            StringBuilder string = new StringBuilder();
-            while (reeder.hasNextLine()) {
-                string.append(reeder.nextLine()).append(" ");
-            }
+        try {
             JsonNode jsonNode = oMapper.readTree(file);
-
             return fromJNode(jsonNode);
         } catch (IOException e) {
             return NULL_SCRIM;
@@ -98,7 +91,7 @@ public class ScrimmageImpl implements Scrimmage {
         var returnScrim = new ScrimmageImpl(teams, location, region, applicationStatus, organizer, sizeLimit, startTime, endTime);
 
         for (Team team : teams) {
-            team.attendeeFor(returnScrim);
+            team.attendeeFor(returnScrim.toLimitedScrim());
         }
 
         return returnScrim;
@@ -169,7 +162,6 @@ public class ScrimmageImpl implements Scrimmage {
     /**
      * Sets the size limit for the event
      *
-     * @param sl
      */
     @Override
     public void setSizeLimit(int sl) {
@@ -179,7 +171,6 @@ public class ScrimmageImpl implements Scrimmage {
     /**
      * Sets the Location for the event
      *
-     * @param location
      */
     @Override
     public void setLocation(Location location) {
@@ -189,7 +180,6 @@ public class ScrimmageImpl implements Scrimmage {
     /**
      * Sets the Region for the event
      *
-     * @param region
      */
     @Override
     public void setRegion(Region region) {
@@ -199,7 +189,6 @@ public class ScrimmageImpl implements Scrimmage {
     /**
      * Sets the ApplicationStatus for the event
      *
-     * @param appStatus
      */
     @Override
     public void setApplicationStatus(ApplicationStatus appStatus) {
@@ -279,8 +268,15 @@ public class ScrimmageImpl implements Scrimmage {
 
     @Override
     public String getIdentifier() {
-        var identifier = organizer.getTeamNum() + "-" + location.city + "-" + startTime.format(DateTimeFormatter.ofPattern("dd_MM_yyyy"));
-        return identifier;
+        return organizer.getTeamNum() + "-" + location.city + "-" + startTime.format(DateTimeFormatter.ofPattern("dd_MM_yyyy"));
+    }
+
+    /**
+     * e
+     */
+    @Override
+    public LimitedScrim toLimitedScrim() {
+        return new LimitedScrim(this);
     }
 
     @Override

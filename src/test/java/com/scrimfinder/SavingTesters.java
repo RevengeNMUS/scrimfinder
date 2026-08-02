@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 public class SavingTesters {
     public static void nonMainSavingTester() throws IOException {
         Team organizer = new Team(12635, "Kuriosity Robotics", Region.NORCAL);
-        organizer.saveTeam();
+        organizer.saveToFile();
         Location loc = new Location(-121.8863, 37.3382, "123 Main St", "San Jose", "CA", "USA");
         ArrayList<Team> teams = new ArrayList<>();
         teams.add(organizer);
