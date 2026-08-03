@@ -3,6 +3,7 @@ package com.scrimfinder.scrimfinder;
 import com.scrimfinder.EDC.ApplicationStatus;
 import com.scrimfinder.EDC.Region;
 import com.scrimfinder.SearchMethods.*;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,9 +24,11 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeoutException;
 
 import static com.scrimfinder.SearchMethods.SearchFactory.PARSER;
+import static com.scrimfinder.scrimfinder.MainConstants.SCRIM_PATH;
 
 @RestController
 @SpringBootApplication
+//@RequestMapping("srimfinder/api/v1")
 public class ServerRunner {
     Main main;
     ObjectMapper oMapper;
@@ -35,7 +39,38 @@ public class ServerRunner {
         main = m;
     }
 
-    @RequestMapping(value = "/createTeam", method = RequestMethod.POST)
+    /**
+     * WEIRDLY NAMED
+     * but updates team to attend/notattend a scrim
+     *
+     * @param id
+     * @return
+     */
+    @PutMapping("/updateTeam/{id}")
+    ResponseEntity<Boolean> updateTeam(
+            @NonNull @PathVariable int id,
+            @NonNull @RequestParam(value = "add") Boolean add,
+            @NonNull @RequestParam(value = "scrimID") String scrimID
+    ) {
+        try {
+            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
+            Team team = main.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
+
+            if (add) {
+                main.joinScrim(team, scrim);
+            } else {
+                main.leaveScrim(team, scrim);
+            }
+
+            return ResponseEntity.ok(true);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping(value = "/createTeam")
     ResponseEntity<Boolean> createTeam(@RequestBody JsonNode jNode) {
         try {
             var team = Team.fromJNode(jNode);
@@ -67,8 +102,8 @@ public class ServerRunner {
     ResponseEntity<JsonNode> getScrims(
             @RequestParam(value = "identifier", required = false) String identifier,
             @RequestParam(value = "region", required = false) String region,
-            @RequestParam(value = "sDatetime", required = false) String sdatetime,
-            @RequestParam(value = "eDatetime", required = false) String edatetime,
+            @RequestParam(value = "startTime", required = false) String sdatetime,
+            @RequestParam(value = "endTime", required = false) String edatetime,
             @RequestParam(value = "date", required = false) String date,
             @RequestParam(value = "teamInScrim", required = false) String teamInScrim,
             @RequestParam(value = "appStatus", required = false) String appStatus)
@@ -110,11 +145,11 @@ public class ServerRunner {
 
     @RequestMapping(value = "/getTeams", method = RequestMethod.GET)
     ResponseEntity<JsonNode> getTeams(
-            @RequestParam(value = "tNumber", required = false) String tNum,
+            @RequestParam(value = "tNum", required = false) String tNum,
             @RequestParam(value = "tName", required = false) String tName,
             @RequestParam(value = "region", required = false) String region,
-            @RequestParam(value = "oScrim", required = false) String oScrim,
-            @RequestParam(value = "aScrim", required = false) String aScrim)
+            @RequestParam(value = "organizedScrims", required = false) String oScrim,
+            @RequestParam(value = "activeScrims", required = false) String aScrim)
     {
         try {
             main.saveTeams();
@@ -154,27 +189,6 @@ public class ServerRunner {
             return ResponseEntity.internalServerError().build();
         }
     }*/
-
-    @RequestMapping(value = "/getTeam/{id}", method = RequestMethod.GET)
-    public ResponseEntity<JsonNode> getTeam(@PathVariable int id) {
-        try {
-            StringBuilder returnString = new StringBuilder();
-            Team team = main.findTeams(new TeamSearch() {
-                @Override
-                public boolean isFound(Team team) {
-                    return team.getTeamNum() == id;
-                }
-
-                @Override
-                public String finderMethod() {
-                    return "team equality";
-                }
-            }).getFirst(); //slop but get owned ig
-            return ResponseEntity.ok(team.getONode(oMapper));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
     @RequestMapping("/")
     String explode() {

@@ -41,7 +41,7 @@ public class LimitedScrim {
         startTime = startTime.plusMinutes(startTime.getMinute()%15 < 8 ? -(startTime.getMinute()%15) : (15-startTime.getMinute()%15)).withSecond(0).withNano(0); //round to 67
     }
 
-    public static LimitedScrim fromJNode(JsonNode jsonNode) throws IOException {
+    public static LimitedScrim fromJNode(JsonNode jsonNode) {
 
         var identifier = jsonNode.get("identifier").asString("");
         var locNode = jsonNode.get("location");
