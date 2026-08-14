@@ -216,21 +216,21 @@ public class Main implements AutoCloseable{
     }
 
     public boolean joinScrim(Team team, Scrimmage scrim) throws IOException, InterruptedException, TimeoutException {
-        team.attendeeFor(scrim.toLimitedScrim());
+        var rBool = team.attendeeFor(scrim.toLimitedScrim());
         scrim.addTeam(team);
         //if smth dies, it dies HERE :000
         saveTeams();
         saveScrims();
-        return true;
+        return rBool;
     }
 
     public boolean leaveScrim(Team team, Scrimmage scrim) throws IOException, InterruptedException, TimeoutException {
-        team.notAttending(scrim.toLimitedScrim());
+        var rBool = team.notAttending(scrim.toLimitedScrim());
         scrim.removeTeam(team);
         //if smth dies, it dies HERE :000
         saveTeams();
         saveScrims();
-        return true;
+        return rBool;
     }
 
     @Override

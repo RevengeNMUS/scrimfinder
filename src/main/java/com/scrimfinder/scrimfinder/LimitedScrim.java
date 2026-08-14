@@ -144,11 +144,11 @@ public class LimitedScrim {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof LimitedScrim that)) return false;
-        return Objects.equals(identifier, that.identifier) && Objects.equals(location, that.location) && region == that.region && applicationStatus == that.applicationStatus && Objects.equals(startTime, that.startTime);
+        return Objects.equals(identifier, that.identifier);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(identifier, location, region, applicationStatus, startTime);
+        return Objects.hash(identifier);
     }
 }
