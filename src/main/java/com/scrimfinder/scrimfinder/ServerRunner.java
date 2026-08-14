@@ -46,23 +46,40 @@ public class ServerRunner {
      * @param id
      * @return
      */
-    @PutMapping("/updateTeam/{id}")
-    ResponseEntity<Boolean> updateTeam(
+    @PutMapping("/teamJoinScrim/{id}")
+    ResponseEntity<Boolean> tJoinScrim(
             @NonNull @PathVariable int id,
-            @NonNull @RequestParam(value = "add") Boolean add,
             @NonNull @RequestParam(value = "scrimID") String scrimID
     ) {
         try {
+            main.loadTeams();
+            main.loadScrims();
+
             ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
             Team team = main.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
 
-            if (add) {
-                main.joinScrim(team, scrim);
-            } else {
-                main.leaveScrim(team, scrim);
-            }
 
-            return ResponseEntity.ok(true);
+            return ResponseEntity.ok(main.joinScrim(team, scrim));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/teamLeaveScrim/{id}")
+    ResponseEntity<Boolean> tLeaveScrim(
+            @NonNull @PathVariable int id,
+            @NonNull @RequestParam(value = "scrimID") String scrimID
+    ) {
+        try {
+            main.loadTeams();
+            main.loadScrims();
+
+            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
+            Team team = main.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
+
+            return ResponseEntity.ok(main.leaveScrim(team, scrim));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (IOException | TimeoutException | InterruptedException e) {
@@ -73,7 +90,7 @@ public class ServerRunner {
     @PostMapping(value = "/createTeam")
     ResponseEntity<Boolean> createTeam(@RequestBody JsonNode jNode) {
         try {
-            var team = Team.fromJNode(jNode);
+            var team = Team.handleCreation(jNode);
             team.saveToFile();
         } catch (IOException e) {
             return ResponseEntity.status(418).build();

@@ -113,6 +113,39 @@ public class Team {
         return new Team(teamNum, teamName, region, activeScrimmages, organizedScrims);
     }
 
+    public static Team handleCreation(JsonNode jsonNode) throws IOException {
+        int teamNum = jsonNode.get("tNum").asInt(0);
+        String teamName = jsonNode.get("tName").asString("");
+        Region region = Region.fromCode(jsonNode.get("region").asString("KNOWHERE"));
+
+        ArrayList<LimitedScrim> activeScrimmages = new ArrayList<>();
+        if(jsonNode.has("activeScrims")) {
+            ArrayNode arNo = jsonNode.get("activeScrims").asArray();
+            for (JsonNode node : arNo) {
+                activeScrimmages.add(LimitedScrim.fromJNode(node));
+            }
+        }
+
+        ArrayList<LimitedScrim> organizedScrims = new ArrayList<>();
+        if(jsonNode.has("organizedScrims")) {
+            ArrayNode arNo = jsonNode.get("organizedScrims").asArray();
+            for (JsonNode node : arNo) {
+                organizedScrims.add(LimitedScrim.fromJNode(node));
+            }
+        }
+
+        /*scrimListString = stingerArray[4].substring(1, stingerArray[4].length() - 1);
+        organizedScrimmages = new ArrayList<Scrimmage>();
+        if (!scrimListString.isBlank()) {
+            var scrimList = scrimListString.split(", ");
+            for (String scrim : scrimList) {
+                organizedScrimmages.add(ScrimmageImpl.fromFile(new File(MainConstants.SCRIM_PATH + scrim + ".txt")));
+            }
+        }*/
+
+        return new Team(teamNum, teamName, region, activeScrimmages, organizedScrims);
+    }
+
     public boolean isAttending(String scrimmage) {
         return activeScrimmages.stream().map(
                 limitedScrim -> limitedScrim.identifier
@@ -129,7 +162,7 @@ public class Team {
     }
 
     public boolean attendeeFor(LimitedScrim scrimmage) {
-        if (!activeScrimmages.contains(scrimmage)) {
+        if (!isAttending(scrimmage.identifier)) {
             activeScrimmages.add(scrimmage);
             return true;
         }
@@ -138,7 +171,12 @@ public class Team {
     }
 
     public boolean notAttending(LimitedScrim scrimmage) {
-        return activeScrimmages.remove(scrimmage);
+        if (isAttending(scrimmage.identifier)) {
+            activeScrimmages.remove(scrimmage);
+            return true;
+        }
+
+        return false;
     }
 
     public void organizerFor(LimitedScrim scrimmage) {

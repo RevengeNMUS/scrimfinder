@@ -15,6 +15,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * scrim data, but not scrim
  */
+/*
 public record TeamUpdate(@Nullable String addOrganizedScrim,
                          @Nullable String addAttendeeScrim,
                          @Nullable String deleteAttendeeScrim,
@@ -41,3 +42,6 @@ public record TeamUpdate(@Nullable String addOrganizedScrim,
         return returnTeam;
     }
 }
+
+temporarily slimed bc AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+*/
