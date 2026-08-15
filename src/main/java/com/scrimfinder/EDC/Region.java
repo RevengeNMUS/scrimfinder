@@ -17,7 +17,8 @@ public enum Region {
             case "NORCAL" -> NORCAL;
             case "SOCAL" -> SOCAL;
             case "KNOWHERE" -> KNOWHERE;
-            case null, default -> KNOWHERE;
+            case null -> KNOWHERE;
+            default -> throw new IllegalStateException("Unexpected value: " + code);
         };
     }
 

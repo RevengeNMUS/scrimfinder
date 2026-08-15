@@ -100,7 +100,7 @@ public class ServerRunner {
     }
 
 
-    @RequestMapping(value = "/createScrim", method = RequestMethod.POST)
+    @PostMapping(value = "/createScrim")
     ResponseEntity<Boolean> createScrim(@RequestBody JsonNode jNode) {
         try {
             var scrim = ScrimmageImpl.fromJNode(jNode);
@@ -112,9 +112,74 @@ public class ServerRunner {
         return ResponseEntity.ok(true);
     }
 
+    @PutMapping(value = "/modifyScrim/{scrimID}")
+    ResponseEntity<Boolean> modScrim(
+            @NonNull @PathVariable String scrimID,
+            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "appStatus", required = false) String appStatus,
+            @RequestParam(value = "size", required = false) Integer size) {
+        try {
+            main.loadScrims();
+//          scrimID = scrimID.replace("%20", " ");
+            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
+
+            if (region != null) {
+                scrim.setRegion(Region.fromCode(region));
+            }
+
+            if (appStatus != null) {
+                scrim.setApplicationStatus(ApplicationStatus.fromStatusString(appStatus));
+            }
+
+            if (size != null) {
+                scrim.setSizeLimit(size);
+            }
+
+            scrim.saveToFile();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+
+        return ResponseEntity.ok(true);
+    }
+
+
+    @PutMapping(value = "/modifyTeam/{id}")
+    ResponseEntity<Boolean> modTeam(
+            @NonNull @PathVariable int id,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "region", required = false) String region) {
+        try {
+            main.loadTeams();
+            Team team = main.findTeam(id);
+
+            if (region != null) {
+                team.setRegion(Region.fromCode(region));
+            }
+
+            if (name != null) {
+                team.setTeamName(name);
+            }
+
+            team.saveToFile();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+
+        return ResponseEntity.ok(true);
+    }
+
     /*
     🛏️🛏️🛏️🛌🛌🛌😴😴😴
      */
+
+    //TODO HOLY CRIMES YOU NEED TO DOCUMENT
     @RequestMapping(value = "/getScrims", method = RequestMethod.GET)
     ResponseEntity<JsonNode> getScrims(
             @RequestParam(value = "identifier", required = false) String identifier,
@@ -155,11 +220,12 @@ public class ServerRunner {
             }
 
             return ResponseEntity.ok(arNode);
-        } catch (ResourceNotFoundException e) {
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).build();
         }
     }
 
+    //TODO HOLY CRIMES YOU NEED TO DOCUMENT
     @RequestMapping(value = "/getTeams", method = RequestMethod.GET)
     ResponseEntity<JsonNode> getTeams(
             @RequestParam(value = "tNum", required = false) String tNum,

@@ -166,6 +166,7 @@ public class ScrimmageImpl implements Scrimmage {
     @Override
     public void setSizeLimit(int sl) {
         sizeLimit = sl;
+        applicationStatus = isFull() ? ApplicationStatus.CLOSED : ApplicationStatus.OPEN;
     }
 
     /**
