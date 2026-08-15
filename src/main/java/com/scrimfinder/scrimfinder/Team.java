@@ -23,8 +23,8 @@ import java.util.Objects;
  */
 public class Team {
     private final int teamNum;
-    private final String teamName;
-    private final Region region;
+    private String teamName;
+    private Region region;
     private final ArrayList<LimitedScrim> activeScrimmages;
     private final ArrayList<LimitedScrim> organizedScrimmages;
 
@@ -37,10 +37,12 @@ public class Team {
     public Region getRegion() {
         return region;
     }
+    public void setRegion(Region newregion) {region = newregion;}
 
     public String getTeamName() {
         return teamName;
     }
+    public void setTeamName(String newtName) {teamName = newtName;}
 
     public ArrayList<LimitedScrim> getActiveScrimmages() {
         return activeScrimmages;
