@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeoutException;
 
 import static com.scrimfinder.SearchMethods.SearchFactory.PARSER;
-import static com.scrimfinder.scrimfinder.MainConstants.SCRIM_PATH;
+import static com.scrimfinder.scrimfinder.MainConstants.*;
 
 @RestController
 @SpringBootApplication
@@ -37,14 +37,16 @@ public class ServerRunner {
     public ServerRunner(ObjectMapper objectMapper, Main m) throws IOException, InterruptedException, TimeoutException {
         oMapper = objectMapper;
         main = m;
+        main.loadScrims();
+        main.loadTeams();
     }
 
     /**
      * WEIRDLY NAMED
-     * but updates team to attend/notattend a scrim
+     * but updates team to attend a scrim
      *
-     * @param id
-     * @return
+     * @param id the id of the team to be added to a scrim
+     * @param scrimID the scrimmage id to be added (formatted as identifier param)
      */
     @PutMapping("/teamJoinScrim/{id}")
     ResponseEntity<Boolean> tJoinScrim(
@@ -67,6 +69,13 @@ public class ServerRunner {
         }
     }
 
+    /**
+     * WEIRDLY NAMED
+     * but updates team to not attend a scrim
+     *
+     * @param id the id of the team to be removed from a scrim
+     * @param scrimID the scrimmage id to be removed (formatted as identifier param)
+     */
     @PutMapping("/teamLeaveScrim/{id}")
     ResponseEntity<Boolean> tLeaveScrim(
             @NonNull @PathVariable int id,
@@ -100,6 +109,12 @@ public class ServerRunner {
     }
 
 
+    /**
+     * CREATES A SCRIM
+     *
+     * @param jNode json version of a scrim to be created
+     * @return whether it was successfully created (or an error)
+     */
     @PostMapping(value = "/createScrim")
     ResponseEntity<Boolean> createScrim(@RequestBody JsonNode jNode) {
         try {
@@ -112,6 +127,15 @@ public class ServerRunner {
         return ResponseEntity.ok(true);
     }
 
+    /**
+     * Modify a certain scrimmage
+     *
+     * @param scrimID REQUIRED scrimmage identifier of scrim to be modified
+     * @param region denoted by "region" in the request header, defines a new region
+     * @param appStatus denoted by appStatus in the request header, defines a new app status
+     * @param size denoted by size in the request header, defines a new size
+     * @return whether twas successful (or an error)
+     */
     @PutMapping(value = "/modifyScrim/{scrimID}")
     ResponseEntity<Boolean> modScrim(
             @NonNull @PathVariable String scrimID,
@@ -122,6 +146,7 @@ public class ServerRunner {
             main.loadScrims();
 //          scrimID = scrimID.replace("%20", " ");
             ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
+            ScrimmageImpl updatedScrim = new ScrimmageImpl(scrim);
 
             if (region != null) {
                 scrim.setRegion(Region.fromCode(region));
@@ -135,7 +160,7 @@ public class ServerRunner {
                 scrim.setSizeLimit(size);
             }
 
-            scrim.saveToFile();
+            main.updateScrim(scrim, updatedScrim);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (IOException | TimeoutException | InterruptedException e) {
@@ -145,7 +170,13 @@ public class ServerRunner {
         return ResponseEntity.ok(true);
     }
 
-
+    /**
+     *
+     * @param id
+     * @param name
+     * @param region
+     * @return
+     */
     @PutMapping(value = "/modifyTeam/{id}")
     ResponseEntity<Boolean> modTeam(
             @NonNull @PathVariable int id,
@@ -153,17 +184,18 @@ public class ServerRunner {
             @RequestParam(value = "region", required = false) String region) {
         try {
             main.loadTeams();
-            Team team = main.findTeam(id);
+            Team oldTeam = main.findTeam(id);
+            Team newTeam = new Team(oldTeam);
 
             if (region != null) {
-                team.setRegion(Region.fromCode(region));
+                newTeam.setRegion(Region.fromCode(region));
             }
 
             if (name != null) {
-                team.setTeamName(name);
+                newTeam.setTeamName(name);
             }
 
-            team.saveToFile();
+            main.updateTeam(oldTeam, newTeam);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
@@ -295,6 +327,30 @@ public class ServerRunner {
 
 TS CODE EMBARRESED ME INFRONT OF A META DEV AIFHEiuAFNHEOEFBouoIAEFbuhEHfiWPFEHu
 */
+
+    //TODO ADD DEL METHOD
+    @DeleteMapping(value = "/deleteScrim/{scrimID}")
+    ResponseEntity<Boolean> delScrim(
+            @NonNull @PathVariable String scrimID
+    ) {
+        try {
+            return ResponseEntity.ok(main.deleteScrim(ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrimID + ".txt"))));
+        } catch (IOException | InterruptedException | TimeoutException e) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
+        }
+    }
+
+    @DeleteMapping(value = "/deleteTeam/{teamID}")
+    ResponseEntity<Boolean> delTeam(
+            @NonNull @PathVariable int team
+    ) {
+        try {
+            return ResponseEntity.ok(main.deleteTeam(Team.of(new File(TEAM_PATH + team + ".txt"))));
+        } catch (IOException | InterruptedException | TimeoutException e) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
+        }
+    }
+
     @RequestMapping(value = "/wSpeed")
     ResponseEntity<byte[]> wSpeed() {
         try {

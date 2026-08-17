@@ -76,6 +76,14 @@ public class Team {
         organizedScrimmages = new ArrayList<>();
     }
 
+    public Team(Team team) {
+        teamNum = team.teamNum;
+        teamName = team.teamName;
+        region = team.region;
+        activeScrimmages = team.activeScrimmages;
+        organizedScrimmages = team.organizedScrimmages;
+    }
+
     public static Team of(File file) throws FileNotFoundException {
         ObjectMapper oMapper = new ObjectMapper();
         try {
@@ -194,6 +202,13 @@ public class Team {
         var uri = MainConstants.TEAM_PATH + teamNum  + ".txt";
         oMap.writeValue(new File(uri), this.getONode(oMap));
         return new File(uri);
+    }
+
+    public boolean deleteFile() {
+        var uri = MainConstants.TEAM_PATH + teamNum  + ".txt";
+        File file = new File(uri);
+        return file.delete();
+        //goonbye team :>
     }
 
     public ObjectNode getONode(ObjectMapper objectMapper) {

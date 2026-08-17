@@ -13,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.scrimfinder.scrimfinder.MainConstants.SCRIM_PATH;
+
 @Repository
 public class Main implements AutoCloseable{
     private static final ReentrantLock rwlock = new ReentrantLock(true);
@@ -33,8 +35,31 @@ public class Main implements AutoCloseable{
             teams.add(team);
         }
 
+        for (LimitedScrim limScrim : team.getActiveScrimmages()) {
+            var scrim = ScrimmageImpl.fromLimitedScrim(limScrim);
+            scrim.addTeam(team);
+        }
+
         saveTeams();
         return true;
+    }
+
+    public boolean deleteTeam(Team team) throws IOException, InterruptedException, TimeoutException {
+        boolean returnBool = teams.remove(team);
+        for (LimitedScrim limScrim : team.getActiveScrimmages()) {
+            var scrim = ScrimmageImpl.fromLimitedScrim(limScrim);
+            scrim.removeTeam(team);
+        }
+
+        for (LimitedScrim limScrim : team.getOrganizedScrimmages()) {
+            var scrim = ScrimmageImpl.fromLimitedScrim(limScrim);
+            deleteScrim(scrim);
+        }
+
+        team.deleteFile();
+        saveScrims();
+        saveTeams();
+        return returnBool;
     }
 
     public boolean addScrim(Scrimmage scrim) throws IOException, InterruptedException, TimeoutException {
@@ -51,6 +76,18 @@ public class Main implements AutoCloseable{
         saveScrims();
         saveTeams();
         return true;
+    }
+
+    public boolean deleteScrim(ScrimmageImpl scrim) throws IOException, InterruptedException, TimeoutException {
+        boolean returnBool = scrims.remove(scrim);
+        for (Team team : scrim.teamsInScrim()) {
+            team.notAttending(scrim.toLimitedScrim());
+        }
+
+        scrim.deleteFile();
+        saveScrims();
+        saveTeams();
+        return returnBool;
     }
 
     public boolean updateScrim(Scrimmage scrim, Scrimmage updatedScrim) throws IOException, InterruptedException, TimeoutException {
@@ -74,12 +111,33 @@ public class Main implements AutoCloseable{
         return true;
     }
 
+    public boolean updateTeam(Team oldTeam, Team newTeam) throws IOException, InterruptedException, TimeoutException {
+        if (!teams.contains(oldTeam)) {
+            throw new ResourceNotFoundException();
+        }
+
+        teams.remove(oldTeam);
+        teams.add(newTeam);
+
+        for (LimitedScrim scrim : oldTeam.getActiveScrimmages()) {
+            ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrim.identifier + ".txt")).removeTeam(oldTeam);
+        }
+
+        for (LimitedScrim scrim : newTeam.getActiveScrimmages()) {
+            ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrim.identifier + ".txt")).addTeam(newTeam);
+        }
+
+        saveScrims();
+        saveTeams();
+        return true;
+    }
+
     public boolean loadScrims() throws IOException, TimeoutException, InterruptedException {
         if (!rwlock.tryLock(10, TimeUnit.SECONDS)) {
             throw new TimeoutException();
         }
 
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Path.of(MainConstants.SCRIM_PATH))) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Path.of(SCRIM_PATH))) {
             scrims.clear();
             stream.forEach(path -> {
                 var scrim = ScrimmageImpl.fromFile(new File(path.toUri()));
