@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.function.IntPredicate;
 import java.util.function.ToIntFunction;
 
+import static com.scrimfinder.scrimfinder.MainConstants.SCRIM_PATH;
+
 
 /**
  * Basically, a Scrimmage!<br>
@@ -45,6 +47,17 @@ public class ScrimmageImpl implements Scrimmage {
         this.sizeLimit = sizeLimit;
         this.startTime = startTime.plusMinutes(startTime.getMinute()%15 < 8 ? -(startTime.getMinute()%15) : (15-startTime.getMinute()%15)).withSecond(0).withNano(0); //round to 67
         this.endTime = endTime.plusMinutes(endTime.getMinute()%15 < 8 ? -(endTime.getMinute()%15) : (15-endTime.getMinute()%15)).withSecond(0).withNano(0);
+    }
+
+    public ScrimmageImpl(ScrimmageImpl scrim) {
+        this.teams = scrim.teams;
+        this.location = scrim.location;
+        this.region = scrim.region;
+        this.applicationStatus = scrim.applicationStatus;
+        this.organizer = scrim.organizer;
+        this.sizeLimit = scrim.sizeLimit;
+        this.startTime = scrim.startTime;
+        this.endTime = scrim.endTime;
     }
 
     public static ScrimmageImpl fromFile(File file) {
@@ -92,6 +105,7 @@ public class ScrimmageImpl implements Scrimmage {
 
         for (Team team : teams) {
             team.attendeeFor(returnScrim.toLimitedScrim());
+            team.saveToFile();
         }
 
         return returnScrim;
@@ -280,6 +294,10 @@ public class ScrimmageImpl implements Scrimmage {
         return new LimitedScrim(this);
     }
 
+    public static ScrimmageImpl fromLimitedScrim(LimitedScrim limScrim) {
+        return ScrimmageImpl.fromFile(new File(SCRIM_PATH + limScrim.identifier + ".txt"));
+    }
+
     @Override
     public ObjectNode getLimitedONode(ObjectMapper oMapper) {
         var oNode = oMapper.createObjectNode();
@@ -323,6 +341,13 @@ public class ScrimmageImpl implements Scrimmage {
         var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".txt";
         om.writeValue(new File(uri), this.getONode(om));
         return new File(uri);
+    }
+
+    public boolean deleteFile() {
+        var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".txt";
+        File file = new File(uri);
+        return file.delete();
+        //goooonbye scrim
     }
 
     @Override
