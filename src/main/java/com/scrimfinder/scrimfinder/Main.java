@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -18,7 +19,7 @@ import static com.scrimfinder.scrimfinder.MainConstants.SCRIM_PATH;
 @Repository
 public class Main implements AutoCloseable{
     private static final ReentrantLock rwlock = new ReentrantLock(true);
-    public static final ArrayList<Scrimmage> scrims = new ArrayList<>();
+    public static final ArrayList<ScrimmageImpl> scrims = new ArrayList<>();
     public static final ArrayList<Team> teams = new ArrayList<>();
 
     public Main() {
@@ -30,6 +31,14 @@ public class Main implements AutoCloseable{
         }
     }
 
+    public void removeOutdatedScrims() throws IOException, InterruptedException, TimeoutException {
+        for (ScrimmageImpl scrim : scrims) {
+            if (LocalDateTime.now().isBefore(scrim.endTime())) {
+                deleteScrim(scrim);
+            }
+        }
+    }
+    
     public boolean addTeam(Team team) throws IOException, InterruptedException, TimeoutException {
         if (!teams.contains(team)) {
             teams.add(team);
@@ -62,7 +71,7 @@ public class Main implements AutoCloseable{
         return returnBool;
     }
 
-    public boolean addScrim(Scrimmage scrim) throws IOException, InterruptedException, TimeoutException {
+    public boolean addScrim(ScrimmageImpl scrim) throws IOException, InterruptedException, TimeoutException {
         if (!scrims.contains(scrim)) {
             scrims.add(scrim);
         }
@@ -84,13 +93,15 @@ public class Main implements AutoCloseable{
             team.notAttending(scrim.toLimitedScrim());
         }
 
+        scrim.organizer.notAttending(scrim.toLimitedScrim());
+
         scrim.deleteFile();
         saveScrims();
         saveTeams();
         return returnBool;
     }
 
-    public boolean updateScrim(Scrimmage scrim, Scrimmage updatedScrim) throws IOException, InterruptedException, TimeoutException {
+    public boolean updateScrim(Scrimmage scrim, ScrimmageImpl updatedScrim) throws IOException, InterruptedException, TimeoutException {
         if (!scrims.contains(scrim)) {
             throw new ResourceNotFoundException();
         }

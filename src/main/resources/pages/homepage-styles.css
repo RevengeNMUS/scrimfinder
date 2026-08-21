@@ -5,6 +5,10 @@
     --container-background: rgb(20,20,20);
     --container-border: rgb(25, 25, 25);
     --header-button-grey: rgb(40, 40, 40);
+    --inner-box-background: rgb(30, 30, 30);;
+    --inner-box-border: rgb(40, 40, 40);;
+    --open-status: forestgreen;
+    --closed-status: #df2c14;
 }
 
 body {
@@ -114,10 +118,11 @@ body {
 }
 
 #live-container {
-    padding: 20px 20px;
+    padding: 10px 10px;
 }
 
 #upcoming-scrims-tag {
+    margin: 10px;
     font-family: Impact, serif;
     font-size: x-large;
     text-align: center;
@@ -137,9 +142,9 @@ body {
     padding: 5px;
     display: flex;
     flex-direction: column;
-    background-color: rgb(20,20,20);
-    border:5px solid rgb(25, 25, 25);
-    box-shadow: 5px 5px rgb(25, 25, 25);
+    background-color: var(--inner-box-background);
+    border:5px solid var(--inner-box-border);
+    box-shadow: 5px 5px var(--inner-box-border);
     border-radius: 10px;
 }
 
@@ -152,7 +157,7 @@ body {
 #live-container > .scrims-container > .scrim-box > #status {
     font-size: x-small;
     font-weight:900;
-    color: forestgreen;
+    color: var(--open-status);
     text-align: left;
 }
 

@@ -189,6 +189,15 @@ public class Team {
         return false;
     }
 
+    public boolean notOrganizing(LimitedScrim scrimmage) {
+        if (isOrganizing(scrimmage.identifier)) {
+            organizedScrimmages.remove(scrimmage);
+            return true;
+        }
+
+        return false;
+    }
+
     public void organizerFor(LimitedScrim scrimmage) {
         organizedScrimmages.add(scrimmage);
     }

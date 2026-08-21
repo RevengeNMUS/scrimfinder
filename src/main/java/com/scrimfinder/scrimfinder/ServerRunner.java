@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -21,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
 
 import static com.scrimfinder.SearchMethods.SearchFactory.PARSER;
@@ -28,11 +31,21 @@ import static com.scrimfinder.scrimfinder.MainConstants.*;
 
 @RestController
 @SpringBootApplication
+@EnableScheduling
 //@RequestMapping("srimfinder/api/v1")
 public class ServerRunner {
     Main main;
     ObjectMapper oMapper;
-TODO, DELETE OLD SCRIM
+
+    @Scheduled(cron = "59 59 * * * *")
+    public void hourlyUpdate() {
+        try{
+            main.removeOutdatedScrims();
+        } catch (Exception e) {
+            //cope :sob: go get a blt twin go rn rn go GO
+        }
+    }
+
     @Autowired
     public ServerRunner(ObjectMapper objectMapper, Main m) throws IOException, InterruptedException, TimeoutException {
         oMapper = objectMapper;
