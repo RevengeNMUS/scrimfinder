@@ -32,7 +32,7 @@ import static com.scrimfinder.scrimfinder.MainConstants.*;
 public class ServerRunner {
     Main main;
     ObjectMapper oMapper;
-
+TODO, DELETE OLD SCRIM
     @Autowired
     public ServerRunner(ObjectMapper objectMapper, Main m) throws IOException, InterruptedException, TimeoutException {
         oMapper = objectMapper;
