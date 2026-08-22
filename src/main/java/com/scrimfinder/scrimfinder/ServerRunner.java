@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -23,15 +25,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
 
 import static com.scrimfinder.SearchMethods.SearchFactory.PARSER;
 import static com.scrimfinder.scrimfinder.MainConstants.*;
 
-@RestController
 @SpringBootApplication
 @EnableScheduling
+@Controller
 //@RequestMapping("srimfinder/api/v1")
 public class ServerRunner {
     Main main;
@@ -80,6 +85,32 @@ public class ServerRunner {
         } catch (IOException | TimeoutException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/homepage")
+    public String homepage(Model model) {
+        try {
+            ArrayList<ScrimmageImpl> scrims = main.findScrims(SearchFactory.buildScrimSearch());
+            scrims.sort(Comparator.comparing(o -> o.endTime));
+            List<ScrimmageImpl> top_scrims = scrims.subList(0, Math.min(6, scrims.size()));
+
+            var cities = new ArrayList<String>();
+            var temp = "";
+            for (ScrimmageImpl scrim : scrims) {
+                temp = scrim.location.city + ", " + scrim.location.state;
+                if (!cities.contains(temp))
+                    cities.add(temp);
+            }
+
+            model.addAttribute("scrims", top_scrims);
+            model.addAttribute("total_scrims", scrims);
+            model.addAttribute("cities_represented", cities.size());
+            model.addAttribute("teams", main.findTeams(SearchFactory.buildTeamSearch()));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().toString();
+        }
+
+        return "homepage";
     }
 
     /**
