@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <title>Scrimfinder Homepage</title>
-    <link rel="stylesheet" href="homepage-styles.css">
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/homepage-styles.css}" />
 </head>
 <body>
 <section>
     <div id="site-header">
-        <div><a href="amongus.com"><img id="logo-image" src="/plsnolook/scrimfinder-logo-wip.png" alt="Logo"/></a></div>
+        <div><a href="amongus.com"><img id="logo-image" th:src="@{spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
         <div><a href="amongus.com"><button class="header-box" id="findScrims">Find Scrimmages</button></a></div>
         <div><a href="amongus.com"><button class="header-box" id="login-signup"> Login/Sign Up </button></a></div>
     </div>
@@ -18,22 +18,46 @@
         <div class="homepage-section" id="live-container">
             <div id="upcoming-scrims-tag"> Upcoming Scrims </div>
             <div class="scrims-container">
-                <div class="scrim-box">
-                    <div id="status">status</div>
-                    <div id="identifier">TNUMS-CityCityCityCity-DD-MM-YYYY</div>
-                    <div id="orgTeam">Org Team: TNUMS</div>
-                    <div id="teams">Teams: [N]/[N]</div>
-                    <div id="region">Region: [REGION]</div>
-                    <div id="city">City: CityCityCityCity</div>
+                <div class="scrim-box" th:each="scrim: ${scrims}">
+                    <div id="status" th:text="${scrim.applicationStatus}">status</div>
+                    <div id="identifier" th:text="${scrim.getIdentifier()}">TNUMS-CityCityCityCity-DD-MM-YYYY</div>
+                    <div id="orgTeam" th:text="${scrim.organizer.teamNum}">Org Team: TNUMS</div>
+                    <div id="teams" th:text="'Teams: ' + ${scrim.teams.size()} + '/' + ${scrim.sizeLimit}">Teams: [N]/[N]</div>
+                    <div id="region" th:text="'Region: ' + ${scrim.region.getRegionCode()}">Region: [REGION]</div>
+                    <div id="city" th:text="'City: ' + ${scrim.location.city} + ', ' + ${scrim.location.state}">City: CityCityCityCity</div>
+                    <div id="date">
+                        <div id="dateTag">
+                            Date:
+                        </div>
+                        <div id="dateTime" th:text="${scrim.endTime.getMonthValue()} + '/' + ${scrim.endTime.getDayOfMonth()}">
+                            NA/NA
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </div>
-        <div class="homepage-section" id="gallery-contain">
-            Gallery
+        <div class="homepage-section" id="gallery-container">
+            <div>
+                <div>
+                    <img id="scrims-symbol" th:src="@{spoinkydoinks/scrimswowwow.png}" alt="Scrims Symbol"/>
+                </div>
+                <div th:text="${scrims.size()} + ' Active Scrimmages'">67 Active Scrimmages</div>
+            </div>
+            <div>
+                <div>
+                    <img id="srims-symbol" th:src="@{spoinkydoinks/teamspoggg.png}" alt="Teams Symbol"/>
+                </div>
+                <div th:text="${teams.size()} + ' Active Teams'">67 Active Teams</div>
+            </div>
+            <div>
+                <div>
+                    <img id="city-symbol" th:src="@{spoinkydoinks/newyorconcretejunglewedreamtomato.png}" alt="Teams Symbol"/>
+                </div>
+                <div th:text="'Across ' + ${cities_represented} + ' Cities'">Across 67 Cities</div>
+            </div>
         </div>
     </div>
-
     <footer id="site-footer">
         <div class="footer-text">Created by Kuriosity Robotics, 12635</div>
         <div class="footer-text">Reach out at <a href="mailto:kuriosityrobotics@gmail.com">kuriosityrobotics@gmail.com</a></div>
