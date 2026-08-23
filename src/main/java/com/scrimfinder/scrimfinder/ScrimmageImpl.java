@@ -76,7 +76,7 @@ public class ScrimmageImpl implements Scrimmage {
         ArrayList<Team> teams = new ArrayList<>();
         var tArrNode = jsonNode.get("teams").asArray();
         for (JsonNode tNode : tArrNode.elements()) {
-            teams.add(Team.of(new File(MainConstants.TEAM_PATH + tNode.get("teamNum").asInt(0) + ".txt"))); // mark all teams as atendees for ts srim you drat
+            teams.add(Team.of(new File(MainConstants.TEAM_PATH + tNode.get("teamNum").asInt(0) + ".json"))); // mark all teams as atendees for ts srim you drat
         }
 
         var locNode = jsonNode.get("location");
@@ -88,7 +88,7 @@ public class ScrimmageImpl implements Scrimmage {
 
         Team organizer;
         try {
-            organizer = Team.of(new File(MainConstants.TEAM_PATH + jsonNode.get("organizer").get("teamNum").asInt(0) + ".txt"));
+            organizer = Team.of(new File(MainConstants.TEAM_PATH + jsonNode.get("organizer").get("teamNum").asInt(0) + ".json"));
         } catch (FileNotFoundException e) {
             organizer = new Team(jsonNode.get("organizer").get("teamNum").asInt(0));
         }
@@ -295,7 +295,7 @@ public class ScrimmageImpl implements Scrimmage {
     }
 
     public static ScrimmageImpl fromLimitedScrim(LimitedScrim limScrim) {
-        return ScrimmageImpl.fromFile(new File(SCRIM_PATH + limScrim.identifier + ".txt"));
+        return ScrimmageImpl.fromFile(new File(SCRIM_PATH + limScrim.identifier + ".json"));
     }
 
     @Override
@@ -338,13 +338,13 @@ public class ScrimmageImpl implements Scrimmage {
     @Override
     public File saveToFile() throws IOException {
         ObjectMapper om = new ObjectMapper();
-        var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".txt";
+        var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".json";
         om.writeValue(new File(uri), this.getONode(om));
         return new File(uri);
     }
 
     public boolean deleteFile() {
-        var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".txt";
+        var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".json";
         File file = new File(uri);
         return file.delete();
         //goooonbye scrim

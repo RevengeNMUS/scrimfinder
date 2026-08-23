@@ -12,7 +12,7 @@ import java.util.concurrent.TimeoutException;
 
 public class SavingTesters {
     public static void nonMainSavingTester() throws IOException {
-        Team organizer = new Team(12635, "Kuriosity Robotics", Region.NORCAL);
+        Team organizer = new Team(12635, "Kuriosity Robotics", "kuriosityrobotics@gmail.com", Region.NORCAL);
         organizer.saveToFile();
         Location loc = new Location(-121.8863, 37.3382, "123 Main St", "San Jose", "CA", "USA");
         ArrayList<Team> teams = new ArrayList<>();
@@ -33,7 +33,7 @@ public class SavingTesters {
 
         System.out.println("___________________________________ \n ___________________________________");
 
-        Scrimmage savedScrim = ScrimmageImpl.fromFile(new File(MainConstants.TEST_SCRIM_PATH + "12635-San Jose-25_06_2026.txt"));
+        Scrimmage savedScrim = ScrimmageImpl.fromFile(new File(MainConstants.TEST_SCRIM_PATH + "12635-San Jose-25_06_2026.json"));
         printScrimInfo(savedScrim);
     }
 
@@ -63,7 +63,7 @@ public class SavingTesters {
 
     public static void viaMainSavingTester() throws IOException, InterruptedException, TimeoutException {
         Main mane = new Main();
-        Team organizer = new Team(12635, "Kuriosity Robotics", Region.NORCAL);
+        Team organizer = new Team(12635, "Kuriosity Robotics", "kuriosityrobotics@gmail.com", Region.NORCAL);
         mane.addTeam(organizer);
         Location loc = new Location(-121.8863, 37.3382, "123 Main St", "San Jose", "CA", "USA");
         ArrayList<Team> teams = new ArrayList<>();
@@ -85,7 +85,7 @@ public class SavingTesters {
 
         System.out.println("___________________________________ \n ___________________________________");
 
-        Scrimmage savedScrim = ScrimmageImpl.fromFile(new File(MainConstants.TEST_SCRIM_PATH + "12635-San Jose-25_06_2026.txt"));
+        Scrimmage savedScrim = ScrimmageImpl.fromFile(new File(MainConstants.TEST_SCRIM_PATH + "12635-San Jose-25_06_2026.json"));
         printScrimInfo(savedScrim);
 
         System.out.println("___________________________________ \n _____ \n ___________________________________");

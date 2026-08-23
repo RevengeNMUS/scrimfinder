@@ -132,7 +132,7 @@ public class LimitedScrim {
      */
     public File saveToFile() throws IOException {
         ObjectMapper om = new ObjectMapper();
-        var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".txt";
+        var uri = MainConstants.SCRIM_PATH + getIdentifier()  + ".json";
         om.writeValue(new File(uri), this.getONode(om));
         return new File(uri);
     }

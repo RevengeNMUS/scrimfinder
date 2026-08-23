@@ -131,11 +131,11 @@ public class Main implements AutoCloseable{
         teams.add(newTeam);
 
         for (LimitedScrim scrim : oldTeam.getActiveScrimmages()) {
-            ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrim.identifier + ".txt")).removeTeam(oldTeam);
+            ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrim.identifier + ".json")).removeTeam(oldTeam);
         }
 
         for (LimitedScrim scrim : newTeam.getActiveScrimmages()) {
-            ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrim.identifier + ".txt")).addTeam(newTeam);
+            ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrim.identifier + ".json")).addTeam(newTeam);
         }
 
         saveScrims();
