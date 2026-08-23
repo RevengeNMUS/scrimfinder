@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class CreateTester {
     public static void main(String[] args) throws Exception {
         Main mane = new Main();
-        Team organizer = new Team(12635, "Kuriosity Robotics", Region.NORCAL);
+        Team organizer = new Team(12635, "Kuriosity Robotics", "kuriosityrobotics@gmail.com", Region.NORCAL);
         mane.addTeam(organizer);
         Location loc = new Location(-121.8863, 37.3382, "123 Main St", "San Jose", "CA", "USA");
         ArrayList<Team> teams = new ArrayList<>();

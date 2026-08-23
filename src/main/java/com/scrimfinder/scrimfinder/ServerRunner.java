@@ -113,6 +113,32 @@ public class ServerRunner {
         return "homepage";
     }
 
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
+        try {
+            ArrayList<ScrimmageImpl> scrims = main.findScrims(SearchFactory.buildScrimSearch());
+            scrims.sort(Comparator.comparing(o -> o.endTime));
+            List<ScrimmageImpl> top_scrims = scrims.subList(0, Math.min(6, scrims.size()));
+
+            var cities = new ArrayList<String>();
+            var temp = "";
+            for (ScrimmageImpl scrim : scrims) {
+                temp = scrim.location.city + ", " + scrim.location.state;
+                if (!cities.contains(temp))
+                    cities.add(temp);
+            }
+
+            model.addAttribute("scrims", top_scrims);
+            model.addAttribute("total_scrims", scrims);
+            model.addAttribute("cities_represented", cities.size());
+            model.addAttribute("teams", main.findTeams(SearchFactory.buildTeamSearch()));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().toString();
+        }
+
+        return "dashboard";
+    }
+
     /**
      * WEIRDLY NAMED
      * but updates team to not attend a scrim
@@ -225,6 +251,7 @@ public class ServerRunner {
     ResponseEntity<Boolean> modTeam(
             @NonNull @PathVariable int id,
             @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "region", required = false) String region) {
         try {
             main.loadTeams();
@@ -237,6 +264,10 @@ public class ServerRunner {
 
             if (name != null) {
                 newTeam.setTeamName(name);
+            }
+
+            if (email != null) {
+                newTeam.setEmail(email);
             }
 
             main.updateTeam(oldTeam, newTeam);
@@ -378,7 +409,7 @@ TS CODE EMBARRESED ME INFRONT OF A META DEV AIFHEiuAFNHEOEFBouoIAEFbuhEHfiWPFEHu
             @NonNull @PathVariable String scrimID
     ) {
         try {
-            return ResponseEntity.ok(main.deleteScrim(ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrimID + ".txt"))));
+            return ResponseEntity.ok(main.deleteScrim(ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrimID + ".json"))));
         } catch (IOException | InterruptedException | TimeoutException e) {
             return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
         }
@@ -389,7 +420,7 @@ TS CODE EMBARRESED ME INFRONT OF A META DEV AIFHEiuAFNHEOEFBouoIAEFbuhEHfiWPFEHu
             @NonNull @PathVariable int team
     ) {
         try {
-            return ResponseEntity.ok(main.deleteTeam(Team.of(new File(TEAM_PATH + team + ".txt"))));
+            return ResponseEntity.ok(main.deleteTeam(Team.of(new File(TEAM_PATH + team + ".json"))));
         } catch (IOException | InterruptedException | TimeoutException e) {
             return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
         }

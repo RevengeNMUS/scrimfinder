@@ -4,16 +4,25 @@
     <title>Scrimfinder Homepage</title>
     <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/homepage-styles.css}" />
 </head>
-<body>
+<body th:style="|background-image:url(@{/spoinkydoinks/homepagebackgroundperhaps.png});|">
 <section>
     <div id="site-header">
-        <div><a href="amongus.com"><img id="logo-image" th:src="@{spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
-        <div><a href="amongus.com"><button class="header-box" id="findScrims">Find Scrimmages</button></a></div>
-        <div><a href="amongus.com"><button class="header-box" id="login-signup"> Login/Sign Up </button></a></div>
+        <div id="site-logo-header">
+            <div><a href="amongus.com"><img id="logo-image" th:src="@{spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
+        </div>
+        <div id="site-buttons-header">
+            <div><a href="amongus.com"><button class="header-box" id="findScrims">Find Scrimmages</button></a></div>
+            <div><a href="amongus.com"><button class="header-box" id="login-signup"> Login/Sign Up </button></a></div>
+        </div>
     </div>
     <div id="homepage-container">
         <div class="homepage-section" id="welcome-container">
-            Welcome to ScrimFinder
+            <div id="submain-welcome-text">
+                Welcome to
+            </div>
+            <div id="main-welcome-text">
+                Scrimfinder
+            </div>
         </div>
         <div class="homepage-section" id="live-container">
             <div id="upcoming-scrims-tag"> Upcoming Scrims </div>

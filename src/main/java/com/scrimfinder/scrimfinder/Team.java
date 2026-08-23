@@ -22,13 +22,15 @@ import java.util.Objects;
  * Scrims Organized<br>
  */
 public class Team {
+    //todo: add desc/contact
     private final int teamNum;
     private String teamName;
+    private String email;
     private Region region;
     private final ArrayList<LimitedScrim> activeScrimmages;
     private final ArrayList<LimitedScrim> organizedScrimmages;
 
-    public static Team NULL_TEAM = new Team(0, "N/A", Region.KNOWHERE);
+    public static Team NULL_TEAM = new Team(-1);
 
     public int getTeamNum() {
         return teamNum;
@@ -52,18 +54,20 @@ public class Team {
         return organizedScrimmages;
     }
 
-    public Team(int tNum, String tName, Region reg, ArrayList<LimitedScrim> aScrims, ArrayList<LimitedScrim> oScrims) {
+    public Team(int tNum, String tName, Region reg, ArrayList<LimitedScrim> aScrims, ArrayList<LimitedScrim> oScrims, String em) {
         teamNum = tNum;
         teamName = tName;
         region = reg;
         activeScrimmages = aScrims;
         organizedScrimmages = oScrims;
+        email = em;
     }
 
-    public Team(int tNum, String tName, Region reg) {
+    public Team(int tNum, String tName, String em, Region reg) {
         teamNum = tNum;
         teamName = tName;
         region = reg;
+        email = em;
         activeScrimmages = new ArrayList<>();
         organizedScrimmages = new ArrayList<>();
     }
@@ -71,6 +75,7 @@ public class Team {
     public Team(int tNum) {
         teamNum = tNum;
         teamName = "N/A";
+        email= "amongus@gmail.com";
         region = Region.KNOWHERE;
         activeScrimmages = new ArrayList<>();
         organizedScrimmages = new ArrayList<>();
@@ -82,6 +87,7 @@ public class Team {
         region = team.region;
         activeScrimmages = team.activeScrimmages;
         organizedScrimmages = team.organizedScrimmages;
+        email = team.email;
     }
 
     public static Team of(File file) throws FileNotFoundException {
@@ -96,6 +102,7 @@ public class Team {
 
     public static Team fromJNode(JsonNode jsonNode) throws IOException {
         int teamNum = jsonNode.get("tNum").asInt(0);
+        String email = jsonNode.get("email").asString("amongus@gmail.com");
         String teamName = jsonNode.get("tName").asString("");
         Region region = Region.fromCode(jsonNode.get("region").asString("KNOWHERE"));
 
@@ -120,12 +127,13 @@ public class Team {
             }
         }*/
 
-        return new Team(teamNum, teamName, region, activeScrimmages, organizedScrims);
+        return new Team(teamNum, teamName, region, activeScrimmages, organizedScrims, email);
     }
 
     public static Team handleCreation(JsonNode jsonNode) throws IOException {
         int teamNum = jsonNode.get("tNum").asInt(0);
         String teamName = jsonNode.get("tName").asString("");
+        String email = jsonNode.get("email").asString("amongus@gmail.com");
         Region region = Region.fromCode(jsonNode.get("region").asString("KNOWHERE"));
 
         ArrayList<LimitedScrim> activeScrimmages = new ArrayList<>();
@@ -153,7 +161,7 @@ public class Team {
             }
         }*/
 
-        return new Team(teamNum, teamName, region, activeScrimmages, organizedScrims);
+        return new Team(teamNum, teamName, region, activeScrimmages, organizedScrims, email);
     }
 
     public boolean isAttending(String scrimmage) {
@@ -208,13 +216,13 @@ public class Team {
      */
     public File saveToFile() throws IOException {
         var oMap = new ObjectMapper();
-        var uri = MainConstants.TEAM_PATH + teamNum  + ".txt";
+        var uri = MainConstants.TEAM_PATH + teamNum  + ".json";
         oMap.writeValue(new File(uri), this.getONode(oMap));
         return new File(uri);
     }
 
     public boolean deleteFile() {
-        var uri = MainConstants.TEAM_PATH + teamNum  + ".txt";
+        var uri = MainConstants.TEAM_PATH + teamNum  + ".json";
         File file = new File(uri);
         return file.delete();
         //goonbye team :>
@@ -225,6 +233,7 @@ public class Team {
 
         oNode.put("tNum", teamNum);
         oNode.put("tName", teamName);
+        oNode.put("email", email);
         oNode.putPOJO("region", getRegion());
         var tempArrN = objectMapper.createArrayNode();
         for (LimitedScrim aScrim : activeScrimmages) {
@@ -246,7 +255,12 @@ public class Team {
         tNode.putPOJO("teamName", getTeamName());
         tNode.putPOJO("teamNum", getTeamNum());
         tNode.putPOJO("region", getRegion());
+        tNode.putPOJO("email", getEmail());
         return tNode;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     @Override
@@ -257,12 +271,11 @@ public class Team {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(teamNum, teamName, region, activeScrimmages, organizedScrimmages);
-    }
-
-    @Override
     public String toString() {
         return String.valueOf(teamNum);
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
