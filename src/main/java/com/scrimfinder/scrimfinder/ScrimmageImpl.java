@@ -86,13 +86,6 @@ public class ScrimmageImpl implements Scrimmage {
 
         var applicationStatus = ApplicationStatus.valueOf(jsonNode.get("appStatus").asString("CLOSED"));
 
-        Team organizer;
-        try {
-            organizer = Team.of(new File(MainConstants.TEAM_PATH + jsonNode.get("organizer").get("teamNum").asInt(0) + ".json"));
-        } catch (FileNotFoundException e) {
-            organizer = new Team(jsonNode.get("organizer").get("teamNum").asInt(0));
-        }
-
         var sizeLimit = jsonNode.get("size").asInt(1);
 
         var parser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -101,11 +94,23 @@ public class ScrimmageImpl implements Scrimmage {
         var endDT = jsonNode.get("endTime").asString("0000-00-00'T'00:00:00");
         var endTime = LocalDateTime.parse(endDT, parser);
 
+        Team organizer;
+        try {
+            organizer = Team.of(new File(MainConstants.TEAM_PATH + jsonNode.get("organizer").get("teamNum").asInt(0) + ".json"));
+        } catch (FileNotFoundException e) {
+            organizer = new Team(jsonNode.get("organizer").get("teamNum").asInt(0));
+        }
+
         var returnScrim = new ScrimmageImpl(teams, location, region, applicationStatus, organizer, sizeLimit, startTime, endTime);
 
         for (Team team : teams) {
             team.attendeeFor(returnScrim.toLimitedScrim());
             team.saveToFile();
+        }
+
+        if (!organizer.isOrganizing(returnScrim.toLimitedScrim().identifier)) {
+            organizer.organizerFor(returnScrim.toLimitedScrim());
+            organizer.saveToFile();
         }
 
         return returnScrim;

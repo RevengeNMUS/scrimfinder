@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A Team! <p>
@@ -18,6 +19,7 @@ import java.util.Objects;
  * Team number<br>
  * Team name<br>
  * Region<br>
+ * Email<br>
  * Active Scrims<br>
  * Scrims Organized<br>
  */
@@ -207,7 +209,8 @@ public class Team {
     }
 
     public void organizerFor(LimitedScrim scrimmage) {
-        organizedScrimmages.add(scrimmage);
+        if(!isOrganizing(scrimmage.identifier))
+            organizedScrimmages.add(scrimmage);
     }
 
     /**
@@ -231,21 +234,22 @@ public class Team {
     public ObjectNode getONode(ObjectMapper objectMapper) {
         var oNode = objectMapper.createObjectNode();
 
+
         oNode.put("tNum", teamNum);
         oNode.put("tName", teamName);
         oNode.put("email", email);
         oNode.putPOJO("region", getRegion());
         var tempArrN = objectMapper.createArrayNode();
-        for (LimitedScrim aScrim : activeScrimmages) {
+        for (LimitedScrim aScrim : activeScrimmages.stream().distinct().toList()) {
             tempArrN.add(aScrim.getONode(objectMapper));
         }
         oNode.putIfAbsent("activeScrims", tempArrN);
 
-        tempArrN = objectMapper.createArrayNode();
-        for (LimitedScrim aScrim : organizedScrimmages) {
-            tempArrN.add(aScrim.getONode(objectMapper));
+        var anothertempArrN = objectMapper.createArrayNode();
+        for (LimitedScrim oScrim : organizedScrimmages.stream().distinct().toList()) {
+            anothertempArrN.add(oScrim.getONode(objectMapper));
         }
-        oNode.putIfAbsent("organizedScrims", tempArrN);
+        oNode.putIfAbsent("organizedScrims", anothertempArrN);
 
         return oNode;
     }

@@ -16,26 +16,11 @@
     --non-header-text: #cdcdcd;
 }
 
-/* Webfont: BOGEM-Regular */
-@font-face {
-    font-family: 'BOGEM';
-    src: url('fonts/BOGEM.ttf') format('truetype'); /* Safari, Android, iOS */
-    font-style: normal;
-    font-weight: normal;
-}
-
-/* Webfont: BOGEM-Regular */
-@font-face {
-    font-family: 'GABO';
-    src: url('fonts/GABO.ttf') format('truetype'); /* Safari, Android, iOS */
-    font-style: normal;
-    font-weight: normal;
-}
-
 body {
     background-color: var(--homepage-background);
     background-size: cover;
     background-repeat: no-repeat;
+    user-select: text;
 }
 
 #site-header {
@@ -62,12 +47,12 @@ body {
 }
 
 #logo-image {
-   border-radius: 15px;
+    border-radius: 15px;
     margin-left: 15px;
     margin-right:15px;
-   position: relative;
-     left: 1px;
-     top: 2px;
+    position: relative;
+    left: 1px;
+    top: 2px;
 }
 
 .header-box {
@@ -88,12 +73,12 @@ body {
 }
 
 .header-box:hover {
-  cursor: pointer;
-  box-shadow: 0px 0px;
-  background-color: rgb(50,50,50);
-  position: relative;
-  left: 0px;
-  top: 0px;
+    cursor: pointer;
+    box-shadow: 0px 0px;
+    background-color: rgb(50,50,50);
+    position: relative;
+    left: 0px;
+    top: 0px;
 }
 
 
@@ -119,61 +104,33 @@ body {
     text-decoration: none;
 }
 
-#homepage-container {
-    margin: 10px;
-    display:grid;
-    grid-template-columns: 3fr 1fr;
-    grid-template-rows: repeat(2, calc((100vh - 150px) / 2));
-}
-
-#homepage-container > .homepage-section:not(#welcome-container) {
-    align-items:center;
-    text-align: center;
-    overflow: auto;
-}
-
-#homepage-container > .homepage-section {
+#main-homepage-container {
     background-color: rgb(20,20,20);
     border:5px solid rgb(25, 25, 25);
     box-shadow: 5px 5px rgb(25, 25, 25);
     border-radius: 10px;
     margin: 7px;
     color: var(--kurio-red);
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
 }
 
-#homepage-container > #welcome-container {
-    padding: 30px;
-    overflow: hidden;
-    overflow-wrap: normal;
+
+/*
+.scrim-box {
+    margin: 10px;
+    padding: 5px;
+    padding-right: 10px;
     display: flex;
     flex-direction: column;
+    background-color: var(--inner-box-background);
+    border:5px solid var(--inner-box-border);
+    box-shadow: 5px 5px var(--inner-box-border);
+    border-radius: 10px;
 }
+*/
 
-#homepage-container > #welcome-container > div {
-    margin: 5px;
-}
-
-#homepage-container > #welcome-container > #submain-welcome-text {
-    text-align: left;
-    font-family: Calibri, serif;
-    font-size: 25px;
-    color: var(--fein);
-}
-
-#homepage-container > #welcome-container > #main-welcome-text {
-    text-align: center;
-    font-family: GABO, serif;
-    font-size: 100px;
-    letter-spacing: 10px;
-    color: var(--kurio-red);
-}
-
-#homepage-container > .homepage-section:nth-child(2) {
-    grid-column: 2;
-    grid-row: 1/3;
-}
-
-#upcoming-scrims-tag {
+.tagged-scrim-viewer > .tag-box {
     margin: 10px;
     font-family: Impact, serif;
     font-size: x-large;
@@ -184,20 +141,32 @@ body {
     align-items:center;
 }
 
-#live-container > .scrims-container {
-    height: calc((100vh - 150px) - 100px);
-    display: flex;
-    flex-direction: column;
+.tagged-scrim-viewer {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
     overflow: auto;
     scroll-margin: 5px;
+    align-items:center;
+    background-color: var(--inner-box-background);
+    border:5px solid var(--inner-box-border);
+    box-shadow: 5px 5px var(--inner-box-border);
+    border-radius: 10px;
+    margin: 10px;
 }
 
-#live-container > .scrims-container > .scrim-box {
+.scrims-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.scrims-container > .scrim-box {
     margin: 10px;
     padding: 5px;
     padding-right: 10px;
+    width: 25vw;
     display: flex;
     flex-direction: column;
+    text-align: center;
     background-color: var(--inner-box-background);
     border:5px solid var(--inner-box-border);
     box-shadow: 5px 5px var(--inner-box-border);
@@ -211,73 +180,91 @@ body {
     font-family: Arial, ui-rounded;
 }
 
-#live-container > .scrims-container > .scrim-box > div {
+.scrims-container > .scrim-box > div {
     margin: 2px 2px 2px 5px;
     font-weight: 500;
     font-family: Arial, ui-rounded;
 }
 
-#live-container > .scrims-container > .scrim-box > #status {
+.scrims-container > .scrim-box > .status {
     font-size: x-small;
     font-weight:900;
     color: var(--open-status);
     text-align: left;
 }
 
-#live-container > .scrims-container > .scrim-box > #identifier {
+.scrims-container > .scrim-box > .identifier {
     font-size: medium;
     font-weight: 700;
     color: var(--fly);
 }
 
-#live-container > .scrims-container > .scrim-box > #orgTeam, #teams, #region, #city {
+.scrims-container > .scrim-box > .orgTeam, .teams, .region, .city {
     font-weight: 600;
     color: var(--non-header-text);
     font-size: small;
     text-align: left;
 }
 
-#live-container > .scrims-container > .scrim-box > #orgTeam {
+.scrims-container > .scrim-box > .orgTeam {
     text-align: center;
 }
 
-#live-container > .scrims-container > .scrim-box > #date > #dateTag {
+.scrims-container > .scrim-box > .date > .dateTag {
     color: var(--non-header-text);
     font-size: x-small;
     font-weight: 500;
 }
 
-#live-container > .scrims-container > .scrim-box > #date > #dateTime {
+.scrims-container > .scrim-box > .date > .dateTime {
     color: var(--non-header-text);
     font-size: small;
     font-weight: 600;
 }
 
-#live-container {
-    overflow: hidden;
-    padding: 10px 10px;
-}
-
-#gallery-container {
+.titles-box {
     display: flex;
     flex-direction: row;
-    justify-content:space-evenly;
-    align-items:center;
-    overflow: hidden;
+    justify-content: space-around;
+    text-align: center;
+    align-items: center;
 }
 
-#gallery-container > div {
-    padding: 10px;
+.main-title {
+    margin: 10px;
+    font-family: Impact, serif;
+    font-size: xxx-large;
+    text-align: center;
     color: var(--kurio-red);
-    font-size: medium;
-    font-weight: 700;
     overflow: hidden;
+    overflow-wrap: normal;
+    align-items:center;
 }
 
-#gallery-container > div > div {
+.sub-main-title {
+    margin: 10px;
     font-family: Arial, ui-rounded;
-    padding: 5px;
     font-size: large;
-    font-weight: 700;
+    text-align: center;
+    color: var(--fein);
     overflow: hidden;
+    overflow-wrap: normal;
+    align-items:center;
+}
+
+.side-titles {
+    margin: 15px;
+    font-family: Arial, ui-rounded;
+    font-size: small;
+    text-align: center;
+    color: var(--fein);
+    overflow: hidden;
+    overflow-wrap: normal;
+    align-items:center;
+}
+
+#team-contact {
+    font-size: small;
+    color: dodgerblue;
+    text-decoration: none;
 }
