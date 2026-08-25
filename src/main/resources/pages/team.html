@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Scrimfinder Homepage</title>
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/team-fit.css}">
+</head>
+<body th:style="|background-image:url(@{/spoinkydoinks/homepagebackgroundperhaps.png});|">
+    <div id="site-header">
+        <div id="site-logo-header">
+            <div><a href="amongus.com"><img id="logo-image" th:src="@{spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
+        </div>
+        <div id="site-buttons-header">
+            <div><a href="amongus.com"><button class="header-box" id="findScrims">Find Scrimmages</button></a></div>
+            <div><a href="amongus.com"><button class="header-box" id="login-signup"> Login/Sign Up </button></a></div>
+        </div>
+    </div>
+
+    <div id="main-homepage-container">
+        <div class="titles-box">
+            <div class="side-titles" id="team-region" th:text="${team.getRegion()}">
+                Region
+            </div>
+            <div id="main-subtitle-box">
+                <div class="main-title" id="team-name" th:text="${team.getTeamName()}">
+                    Triple T Tungsters
+                </div>
+                <div class="sub-main-title" id="team-num" th:text="${team.getTeamNum()}">
+                    6767
+                </div>
+            </div>
+            <a th:href="@{|mailto:${team.getEmail()}|}"><div class="side-titles" id="team-contact" th:text="${team.getEmail()}">
+                susus@amogus.com
+            </div></a>
+        </div>
+        <div class="tagged-scrim-viewer" id="organized">
+            <div class="tag-box" id="organized-tag">Organized Scrims</div>
+            <div class="scrims-container">
+                <div class="scrim-box" th:each="orgscrim: ${orgscrims}">
+                    <div class="status" th:text="${orgscrim.applicationStatus}">status</div>
+                    <div class="identifier" th:text="${orgscrim.getIdentifier()}">TNUMS-CityCityCityCity-DD-MM-YYYY</div>
+                    <a th:href="@{|/team?id=${orgscrim.organizer.teamNum}|}"><div class="orgTeam" th:text="${orgscrim.organizer.teamNum}">Org Team: TNUMS</div> </a>
+                    <div class="teams" th:text="'Teams: ' + ${orgscrim.teams.size()} + '/' + ${orgscrim.sizeLimit}">Teams: [N]/[N]</div>
+                    <div class="region" th:text="'Region: ' + ${orgscrim.region.getRegionCode()}">Region: [REGION]</div>
+                    <div class="city" th:text="'City: ' + ${orgscrim.location.city} + ', ' + ${orgscrim.location.state}">City: CityCityCityCity</div>
+                    <div class="date">
+                        <div class="dateTag">
+                            Date:
+                        </div>
+                        <div class="dateTime" th:text="${orgscrim.endTime.getMonthValue()} + '/' + ${orgscrim.endTime.getDayOfMonth()}">
+                            NA/NA
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tagged-scrim-viewer" id="attending">
+            <div class="tag-box" id="attending-tag">Attending Scrims</div>
+            <div class="scrims-container">
+                <div class="scrim-box" th:each="attscrim: ${attscrims}">
+                    <div class="status" th:text="${attscrim.applicationStatus}">status</div>
+                    <div class="identifier" th:text="${attscrim.getIdentifier()}">TNUMS-CityCityCityCity-DD-MM-YYYY</div>
+                    <a th:href="@{|/team?id=${attscrim.organizer.teamNum}|}"><div class="orgTeam" th:text="${attscrim.organizer.teamNum}">Org Team: TNUMS</div> </a>
+                    <div class="teams" th:text="'Teams: ' + ${attscrim.teams.size()} + '/' + ${attscrim.sizeLimit}">Teams: [N]/[N]</div>
+                    <div class="region" th:text="'Region: ' + ${attscrim.region.getRegionCode()}">Region: [REGION]</div>
+                    <div class="city" th:text="'City: ' + ${attscrim.location.city} + ', ' + ${attscrim.location.state}">City: CityCityCityCity</div>
+                    <div class="date">
+                        <div class="dateTag">
+                            Date:
+                        </div>
+                        <div class="dateTime" th:text="${attscrim.endTime.getMonthValue()} + '/' + ${attscrim.endTime.getDayOfMonth()}">
+                            NA/NA
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <footer id="site-footer">
+        <div class="footer-text">Created by Kuriosity Robotics, 12635</div>
+        <div class="footer-text">Reach out at <a href="mailto:kuriosityrobotics@gmail.com">kuriosityrobotics@gmail.com</a></div>
+    </footer>
+</body>
+</html>

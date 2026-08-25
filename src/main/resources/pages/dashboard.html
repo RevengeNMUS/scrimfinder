@@ -31,7 +31,7 @@
                 <div class="scrim-box" th:each="scrim: ${scrims}">
                     <div id="status" th:text="${scrim.applicationStatus}">status</div>
                     <div id="identifier" th:text="${scrim.getIdentifier()}">TNUMS-CityCityCityCity-DD-MM-YYYY</div>
-                    <div id="orgTeam" th:text="${scrim.organizer.teamNum}">Org Team: TNUMS</div>
+                    <a th:href="@{|/team?id=${scrim.organizer.teamNum}|}"><div id="orgTeam" th:text="${scrim.organizer.teamNum}">Org Team: TNUMS</div></a>
                     <div id="teams" th:text="'Teams: ' + ${scrim.teams.size()} + '/' + ${scrim.sizeLimit}">Teams: [N]/[N]</div>
                     <div id="region" th:text="'Region: ' + ${scrim.region.getRegionCode()}">Region: [REGION]</div>
                     <div id="city" th:text="'City: ' + ${scrim.location.city} + ', ' + ${scrim.location.state}">City: CityCityCityCity</div>

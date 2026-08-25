@@ -59,34 +59,6 @@ public class ServerRunner {
         main.loadTeams();
     }
 
-    /**
-     * WEIRDLY NAMED
-     * but updates team to attend a scrim
-     *
-     * @param id the id of the team to be added to a scrim
-     * @param scrimID the scrimmage id to be added (formatted as identifier param)
-     */
-    @PutMapping("/teamJoinScrim/{id}")
-    ResponseEntity<Boolean> tJoinScrim(
-            @NonNull @PathVariable int id,
-            @NonNull @RequestParam(value = "scrimID") String scrimID
-    ) {
-        try {
-            main.loadTeams();
-            main.loadScrims();
-
-            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
-            Team team = main.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
-
-
-            return ResponseEntity.ok(main.joinScrim(team, scrim));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (IOException | TimeoutException | InterruptedException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
     @GetMapping("/homepage")
     public String homepage(Model model) {
         try {
@@ -137,6 +109,62 @@ public class ServerRunner {
         }
 
         return "dashboard";
+    }
+
+    @GetMapping("/team/{id}")
+    public String team(Model model,
+                       @NonNull @PathVariable int id) {
+        try {
+            Team team = null;
+            team = main.findTeam(id);
+            model.addAttribute("team", team);
+
+            ArrayList<ScrimmageImpl> otemp = new ArrayList<>();
+            for (LimitedScrim organizedScrimmage : team.getOrganizedScrimmages()) {
+                otemp.add(ScrimmageImpl.fromLimitedScrim(organizedScrimmage));
+            }
+
+            ArrayList<ScrimmageImpl> atemp = new ArrayList<>();
+            for (LimitedScrim activeScrim : team.getActiveScrimmages()) {
+                atemp.add(ScrimmageImpl.fromLimitedScrim(activeScrim));
+            }
+
+            model.addAttribute("orgscrims", otemp);
+            model.addAttribute("attscrims", atemp);
+            model.addAttribute("team", team);
+        } catch (ResourceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        return "team";
+    }
+
+    /**
+     * WEIRDLY NAMED
+     * but updates team to attend a scrim
+     *
+     * @param id the id of the team to be added to a scrim
+     * @param scrimID the scrimmage id to be added (formatted as identifier param)
+     */
+    @PutMapping("/teamJoinScrim/{id}")
+    ResponseEntity<Boolean> tJoinScrim(
+            @NonNull @PathVariable int id,
+            @NonNull @RequestParam(value = "scrimID") String scrimID
+    ) {
+        try {
+            main.loadTeams();
+            main.loadScrims();
+
+            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
+            Team team = main.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
+
+
+            return ResponseEntity.ok(main.joinScrim(team, scrim));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**
