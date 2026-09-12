@@ -61,7 +61,32 @@
     </div>
     <div id="homepage-container">
         <div class="homepage-section" id="live-container">
+            <div id="search-container">
+                <!--
 
+
+
+
+                -->
+            </div>
+            <div class="scrims-container">
+                <div class="scrim-box" th:each="scrim: ${scrims}">
+                    <div id="status" th:text="${scrim.applicationStatus}">status</div>
+                    <a th:href="@{|/scrim/${scrim.getIdentifier()}|}" target="_blank"> <div id="identifier" th:text="${scrim.getIdentifier()}" >TNUMS-CityCityCityCity-DD-MM-YYYY</div></a>
+                    <a th:href="@{|/team/${scrim.organizer.teamNum}|}" target="_blank"> <div id="orgTeam" th:text="${scrim.organizer.teamNum}">Org Team: TNUMS</div></a>
+                    <div id="teams" th:text="'Teams: ' + ${scrim.teams.size()} + '/' + ${scrim.sizeLimit}">Teams: [N]/[N]</div>
+                    <div id="region" th:text="'Region: ' + ${scrim.region.getRegionCode()}">Region: [REGION]</div>
+                    <div id="city" th:text="'City: ' + ${scrim.location.city} + ', ' + ${scrim.location.state}">City: CityCityCityCity</div>
+                    <div id="date">
+                        <div id="dateTag">
+                            Date:
+                        </div>
+                        <div id="dateTime" th:text="${scrim.endTime.getMonthValue()} + '/' + ${scrim.endTime.getDayOfMonth()}">
+                            NA/NA
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="homepage-section" id="map">
             <gmp-map center="-25.344,131.031" zoom="4" map-id="8444e43957e825dbbe3e563f">

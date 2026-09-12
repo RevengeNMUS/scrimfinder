@@ -36,6 +36,7 @@ body {
     background-color: var(--homepage-background);
     background-size: cover;
     background-repeat: no-repeat;
+    user-select: text
 }
 
 #site-header {
@@ -216,4 +217,96 @@ body {
     color: var(--non-header-text);
     font-size: small;
     font-weight: 600;
+}
+
+#live-container > .scrims-container {
+    height: calc((100vh - 150px) - 100px);
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    scroll-margin: 5px;
+}
+
+#live-container > .scrims-container > .scrim-box {
+    margin: 10px;
+    padding: 5px;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--inner-box-background);
+    border:5px solid var(--inner-box-border);
+    box-shadow: 5px 5px var(--inner-box-border);
+    border-radius: 10px;
+}
+
+.scrim-box > a > #orgTeam{
+    color: dodgerblue;
+    text-decoration: none;
+    font-weight: 500;
+    font-family: Arial, ui-rounded;
+}
+
+#live-container > .scrims-container > .scrim-box > div {
+    margin: 2px 2px 2px 5px;
+    font-weight: 500;
+    font-family: Arial, ui-rounded;
+}
+
+#live-container > .scrims-container > .scrim-box > a {
+    margin: 2px 2px 2px 5px;
+    font-weight: 500;
+    font-family: Arial, ui-rounded;
+}
+
+#live-container > .scrims-container > .scrim-box > #status {
+    font-size: x-small;
+    font-weight:900;
+    color: var(--open-status);
+    text-align: left;
+}
+
+#live-container > .scrims-container > .scrim-box > a > #identifier {
+    font-size: medium;
+    font-weight: 700;
+    color: var(--fly);
+}
+
+#live-container > .scrims-container > .scrim-box > #orgTeam, #teams, #region, #city {
+    font-weight: 600;
+    color: var(--non-header-text);
+    font-size: small;
+    text-align: left;
+}
+
+#live-container > .scrims-container > .scrim-box > #orgTeam {
+    text-align: center;
+}
+
+#live-container > .scrims-container > .scrim-box > #date > #dateTag {
+    color: var(--non-header-text);
+    font-size: x-small;
+    font-weight: 500;
+}
+
+#live-container > .scrims-container > .scrim-box > #date > #dateTime {
+    color: var(--non-header-text);
+    font-size: small;
+    font-weight: 600;
+}
+
+#live-container {
+    overflow: hidden;
+    padding: 10px 10px;
+}
+
+
+#upcoming-scrims-tag {
+    margin: 10px;
+    font-family: Impact, serif;
+    font-size: x-large;
+    text-align: center;
+    color: var(--kurio-red);
+    overflow: hidden;
+    overflow-wrap: normal;
+    align-items:center;
 }

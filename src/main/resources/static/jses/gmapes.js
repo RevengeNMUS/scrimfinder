@@ -58,12 +58,12 @@ async function init() {
                     <div id="status" style="font-size: x-small;font-weight:900;color: var(${eeatbacon});text-align: left;margin: 2px 2px 2px 5px;font-family: Arial, ui-rounded;">
                         ${scrims[i].appStatus}
                     </div>
-                    <a href="http://localhost:8080/findScrim/${scrims[i].identifier}" style="color: dodgerblue; text-decoration: none;font-weight: 500; font-family: Arial, ui-rounded;">
+                    <a href="http://localhost:8080/findScrim/${scrims[i].identifier}" target="_blank" style="color: dodgerblue; text-decoration: none;font-weight: 500; font-family: Arial, ui-rounded;">
                         <div id="identifier" style="font-size: medium;font-weight: 700;color: var(--fly);">
                             ${scrims[i].identifier}
                         </div>
                     </a>
-                    <a href="/team/${scrims[i].organizer.teamNum}" style="color: dodgerblue; text-decoration: none;font-weight: 500; font-family: Arial, ui-rounded;">
+                    <a href="/team/${scrims[i].organizer.teamNum}" target="_blank" style="color: dodgerblue; text-decoration: none;font-weight: 500; font-family: Arial, ui-rounded;">
                         <div id="orgTeam" style="font-weight: 600;color: var(--non-header-text);font-size: small;text-align: center;">
                             Org Team: ${scrims[i].organizer.teamNum}"
                         </div>
