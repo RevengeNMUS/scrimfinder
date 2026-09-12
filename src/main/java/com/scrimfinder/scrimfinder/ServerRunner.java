@@ -6,7 +6,10 @@ import com.scrimfinder.SearchMethods.*;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +37,8 @@ import java.util.concurrent.TimeoutException;
 import static com.scrimfinder.SearchMethods.SearchFactory.PARSER;
 import static com.scrimfinder.scrimfinder.MainConstants.*;
 
-@SpringBootApplication
+@Configuration
+@SpringBootApplication(exclude={DataSourceAutoConfiguration.class})
 @EnableScheduling
 @Controller
 //@RequestMapping("srimfinder/api/v1")
@@ -109,6 +113,53 @@ public class ServerRunner {
         }
 
         return "dashboard";
+    }
+
+    @GetMapping("/searchScrims/")
+    public String sScrims(Model model,
+                          @RequestParam(value = "identifier", required = false) String identifier,
+                          @RequestParam(value = "region", required = false) String region,
+                          @RequestParam(value = "startTime", required = false) String sdatetime,
+                          @RequestParam(value = "endTime", required = false) String edatetime,
+                          @RequestParam(value = "date", required = false) String date,
+                          @RequestParam(value = "teamInScrim", required = false) String teamInScrim,
+                          @RequestParam(value = "appStatus", required = false) String appStatus)
+    {
+        try {
+            var fullList = main.findScrims(SearchFactory.SCRIM_DEFAULT);
+            Region reg = region != null ? Region.valueOf(region) : null;
+            var regionList = Main.findScrims(fullList, SearchFactory.buildScrimSearch(reg));
+
+            LocalDateTime sdt = null;
+            LocalDateTime edt = null;
+            if (!(sdatetime == null && edatetime == null)) {
+                sdt = sdatetime != null ? LocalDateTime.parse(sdatetime, PARSER) : LocalDateTime.of(1,1,1,1,1);
+                edt = edatetime != null ? LocalDateTime.parse(edatetime, PARSER) : LocalDateTime.of(3000,12,31,23,59);
+            }
+            var rangedList = Main.findScrims(regionList, SearchFactory.buildScrimSearch(sdt, edt));
+
+            LocalDate ld = date != null ? LocalDateTime.parse(date, PARSER).toLocalDate() : null;
+            var datedList = Main.findScrims(rangedList, SearchFactory.buildScrimSearch(ld));
+
+            Team team = teamInScrim != null ? new Team(Integer.parseInt(teamInScrim)) : null;
+            var teamList = Main.findScrims(datedList, SearchFactory.buildScrimSearch(team));
+
+            var identifierList = Main.findScrims(teamList, SearchFactory.buildScrimSearch(identifier));
+
+            var fullyFilteredList = Main.findScrims(identifierList, SearchFactory.buildScrimSearch(ApplicationStatus.fromStatusString(appStatus)));
+
+            var arNode = oMapper.createArrayNode();
+            for (Scrimmage scrim : fullyFilteredList) {
+                arNode.add(scrim.getONode(oMapper));
+            }
+
+            model.addAttribute("scrims", fullyFilteredList);
+            model.addAttribute("jsonScrims", arNode.toString());
+
+            return "fscrims";
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).build().toString();
+        }
     }
 
     @GetMapping("/team/{id}")

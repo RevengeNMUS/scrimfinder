@@ -13,14 +13,15 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import static com.scrimfinder.scrimfinder.MainConstants.SCRIM_PATH;
 
 @Repository
 public class Main implements AutoCloseable{
     private static final ReentrantLock rwlock = new ReentrantLock(true);
-    public static final ArrayList<ScrimmageImpl> scrims = new ArrayList<>();
-    public static final ArrayList<Team> teams = new ArrayList<>();
+    private static ArrayList<ScrimmageImpl> scrims = new ArrayList<>();
+    private static ArrayList<Team> teams = new ArrayList<>();
 
     public Main() {
         try {
@@ -183,6 +184,9 @@ public class Main implements AutoCloseable{
         }
 
         try {
+            scrims = (ArrayList<ScrimmageImpl>) scrims.stream().distinct().collect(Collectors.toList());
+
+
             for (Scrimmage scrim : scrims) {
                 scrim.saveToFile();
             }
@@ -198,6 +202,8 @@ public class Main implements AutoCloseable{
             throw new TimeoutException();
         }
         try {
+            teams = (ArrayList<Team>) teams.stream().distinct().collect(Collectors.toList());
+
             for (Team team : teams) {
                 team.saveToFile();
             }

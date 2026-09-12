@@ -4,7 +4,7 @@ public enum ApplicationStatus {
     OPEN("OPEN"),
     CLOSED("CLOSED");
 
-    String statusString;
+    public String statusString;
     private ApplicationStatus(String statusString) {
         this.statusString = statusString;
     }
