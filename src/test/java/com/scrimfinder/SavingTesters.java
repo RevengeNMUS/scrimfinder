@@ -79,7 +79,7 @@ public class SavingTesters {
                 LocalDateTime.now().plusHours(3)
         ));
 
-        for (Scrimmage scrim : Main.scrims) {
+        for (Scrimmage scrim : mane.findScrims(SearchFactory.buildScrimSearch())) {
             printScrimInfo(scrim);
         }
 

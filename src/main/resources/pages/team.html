@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Scrimfinder Homepage</title>
+    <title th:text="|Scrimfinder - ${team.getTeamNum()}|">Scrimfinder -</title>
     <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/team-fit.css}">
 </head>
 <body th:style="|background-image:url(@{/spoinkydoinks/homepagebackgroundperhaps.png});|">
     <div id="site-header">
         <div id="site-logo-header">
-            <div><a href="amongus.com"><img id="logo-image" th:src="@{spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
+            <div><a href="/dashboard"><img id="logo-image" th:src="@{spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
         </div>
         <div id="site-buttons-header">
-            <div><a href="amongus.com"><button class="header-box" id="findScrims">Find Scrimmages</button></a></div>
-            <div><a href="amongus.com"><button class="header-box" id="login-signup"> Login/Sign Up </button></a></div>
+            <div><a th:href="amongus.com"><button class="header-box" id="findScrims">Find Scrimmages</button></a></div>
+            <div><a th:href="amongus.com"><button class="header-box" id="login-signup"> Login/Sign Up </button></a></div>
         </div>
     </div>
 
@@ -38,7 +38,7 @@
                 <div class="scrim-box" th:each="orgscrim: ${orgscrims}">
                     <div class="status" th:text="${orgscrim.applicationStatus}">status</div>
                     <div class="identifier" th:text="${orgscrim.getIdentifier()}">TNUMS-CityCityCityCity-DD-MM-YYYY</div>
-                    <a th:href="@{|/team?id=${orgscrim.organizer.teamNum}|}"><div class="orgTeam" th:text="${orgscrim.organizer.teamNum}">Org Team: TNUMS</div> </a>
+                    <a th:href="@{|/team/${orgscrim.organizer.teamNum}|}"><div class="orgTeam" th:text="${orgscrim.organizer.teamNum}">Org Team: TNUMS</div> </a>
                     <div class="teams" th:text="'Teams: ' + ${orgscrim.teams.size()} + '/' + ${orgscrim.sizeLimit}">Teams: [N]/[N]</div>
                     <div class="region" th:text="'Region: ' + ${orgscrim.region.getRegionCode()}">Region: [REGION]</div>
                     <div class="city" th:text="'City: ' + ${orgscrim.location.city} + ', ' + ${orgscrim.location.state}">City: CityCityCityCity</div>

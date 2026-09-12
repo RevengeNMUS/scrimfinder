@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scrimfinder - Find Scrims</title>
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/find-yumyums.css}"/>
+    <script type="module" th:src="@{/jses/gmapes.js}"></script>
+    <!--
+    <script>
+        async function init() {
+            const [{ AdvancedMarkerElement }] = await Promise.all([
+                google.maps.importLibrary('marker'),
+                google.maps.importLibrary('maps'),
+            ]);
+
+            const mapElement = document.querySelector('gmp-map');
+
+            // Get the inner map.
+            const innerMap = mapElement.innerMap;
+
+            // Set map options.
+            innerMap.setOptions({
+                mapTypeControl: true,
+            });
+
+            const scrims = JSON.parse('[(${jsonScrims})]');
+            console.log(scrims);
+
+            for(var i = 0; i<scrims.length; i++) {
+                mapElement.append(new AdvancedMarkerElement({
+                    map: innerMap,
+                    position: {lat: scrims[i].location.latitude, lng: scrims[i].location.longitude},
+                    title: scrims[i].applicationStatus.toString()
+                }))
+            }
+        }
+
+        init();
+    </script>
+    -->
+    <script>
+        // prettier-ignore
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+            key: "AIzaSyBndwE5U3xdTC9dochw9KrTgdbObujYH8E",
+            v: "weekly"
+        });
+    </script>
+    <!--<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBndwE5U3xdTC9dochw9KrTgdbObujYH8E&callback=console.debug&libraries=maps,marker&v=beta"></script>-->
+</head>
+<body th:style="|background-image:url(@{/spoinkydoinks/homepagebackgroundperhaps.png});|">
+<section>
+    <div id="site-header">
+        <div id="site-logo-header">
+            <div><a href="/dashboard"><img id="logo-image" th:src="@{/spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
+        </div>
+        <div id="site-buttons-header">
+            <div><a href="amongus.com"><button class="header-box" id="findScrims">Find Scrims</button></a></div>
+            <div><a href="amongus.com"><button class="header-box" id="manage-scrims">Manage Scrims</button></a></div>
+            <div><a href="amongus.com"><button class="header-box" id="profile">Profile</button></a></div>
+        </div>
+    </div>
+    <div id="homepage-container">
+        <div class="homepage-section" id="live-container">
+
+        </div>
+        <div class="homepage-section" id="map">
+            <gmp-map center="-25.344,131.031" zoom="4" map-id="8444e43957e825dbbe3e563f">
+
+                <!--<gmp-advanced-marker th:each="scrim : ${scrims}" th:position="|${scrim.location.latitude},${scrim.location.longitude}|" title="My location"></gmp-advanced-marker>-->
+            </gmp-map>
+        </div>
+    </div>
+    <footer id="site-footer">
+        <div class="footer-text">Created by Kuriosity Robotics, 12635</div>
+        <div class="footer-text">Reach out at <a href="mailto:kuriosityrobotics@gmail.com">kuriosityrobotics@gmail.com</a></div>
+    </footer>
+</section>
+</body>
+</html>
