@@ -219,8 +219,16 @@ body {
     font-weight: 600;
 }
 
+#live-container {
+    display: grid;
+}
+
+#live-container > #search-container {
+    height: 27vh
+}
+
 #live-container > .scrims-container {
-    height: calc((100vh - 150px) - 100px);
+    height: calc((73vh - 75px) - 100px);
     display: flex;
     flex-direction: column;
     overflow: auto;
