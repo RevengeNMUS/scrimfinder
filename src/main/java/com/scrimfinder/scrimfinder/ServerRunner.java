@@ -115,7 +115,7 @@ public class ServerRunner {
         return "dashboard";
     }
 
-    @GetMapping("/searchScrims/")
+    @GetMapping("/searchScrims")
     public String sScrims(Model model,
                           @RequestParam(value = "identifier", required = false) String identifier,
                           @RequestParam(value = "region", required = false) String region,

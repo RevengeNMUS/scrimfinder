@@ -14,7 +14,7 @@ async function init() {
         mapTypeControl: true,
     });
 
-    const url = 'http://localhost:8080/getScrims';
+    const url = `http://localhost:8080/getScrims${location.search}`;
 
     try {
         const fet = await fetch(url);
@@ -63,7 +63,7 @@ async function init() {
                             ${scrims[i].identifier}
                         </div>
                     </a>
-                    <a href="/team/${scrims[i].organizer.teamNum}" target="_blank" style="color: dodgerblue; text-decoration: none;font-weight: 500; font-family: Arial, ui-rounded;">
+                    <a href="/team/${scrims[i].organizer.teamNum}" target="_blank style="color: dodgerblue; text-decoration: none;font-weight: 500; font-family: Arial, ui-rounded;">
                         <div id="orgTeam" style="font-weight: 600;color: var(--non-header-text);font-size: small;text-align: center;">
                             Org Team: ${scrims[i].organizer.teamNum}"
                         </div>
