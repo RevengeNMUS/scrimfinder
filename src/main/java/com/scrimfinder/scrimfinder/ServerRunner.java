@@ -66,6 +66,9 @@ public class ServerRunner {
     @GetMapping("/homepage")
     public String homepage(Model model) {
         try {
+            main.loadTeams();
+            main.loadScrims();
+
             ArrayList<ScrimmageImpl> scrims = main.findScrims(SearchFactory.buildScrimSearch());
             scrims.sort(Comparator.comparing(o -> o.endTime));
             List<ScrimmageImpl> top_scrims = scrims.subList(0, Math.min(6, scrims.size()));
@@ -84,6 +87,10 @@ public class ServerRunner {
             model.addAttribute("teams", main.findTeams(SearchFactory.buildTeamSearch()));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().toString();
+        } catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().toString();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).toString();
         }
 
         return "homepage";
@@ -92,6 +99,9 @@ public class ServerRunner {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         try {
+            main.loadTeams();
+            main.loadScrims();
+
             ArrayList<ScrimmageImpl> scrims = main.findScrims(SearchFactory.buildScrimSearch());
             scrims.sort(Comparator.comparing(o -> o.endTime));
             List<ScrimmageImpl> top_scrims = scrims.subList(0, Math.min(6, scrims.size()));
@@ -110,6 +120,10 @@ public class ServerRunner {
             model.addAttribute("teams", main.findTeams(SearchFactory.buildTeamSearch()));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().toString();
+        } catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().toString();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).toString();
         }
 
         return "dashboard";
@@ -126,6 +140,9 @@ public class ServerRunner {
                           @RequestParam(value = "appStatus", required = false) String appStatus)
     {
         try {
+            main.loadScrims();
+            main.loadTeams();
+
             var fullList = main.findScrims(SearchFactory.SCRIM_DEFAULT);
             Region reg = region != null ? Region.valueOf(region) : null;
             var regionList = Main.findScrims(fullList, SearchFactory.buildScrimSearch(reg));
@@ -157,9 +174,14 @@ public class ServerRunner {
             model.addAttribute("jsonScrims", arNode.toString());
 
             return "fscrims";
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatusCode.valueOf(404)).build().toString();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().toString();
+        } catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().toString();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).toString();
         }
+
     }
 
     @GetMapping("/team/{id}")

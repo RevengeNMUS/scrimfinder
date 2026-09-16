@@ -1,6 +1,80 @@
 const mapElement = document.querySelector('gmp-map');
+const url = `http://localhost:8080/getScrims${location.search}`;
 
-async function init() {
+function buttonClicked(id) {
+    var button = document.getElementById(id);
+    if(button.getAttribute("aria-selected") === "false"){
+        button.setAttribute("aria-selected", "true");
+    } else {
+        button.setAttribute("aria-selected", "false");
+    }
+}
+
+
+function initNutsAndBolts() {
+    const mparam = new URLSearchParams(window.location.search);
+
+    if(mparam.has('region')) {
+        const region = mparam.get('region');
+        const regionTag = document.getElementById(region);
+        regionTag.setAttribute("selected", "selected");
+    }
+
+    if(mparam.has('identifier')) {
+        const identifie = mparam.get('identifier');
+        const scrimsearcher = document.getElementById("scrimsearcher");
+        scrimsearcher.setAttribute("content", identifie);
+    }
+
+    if(mparam.has('appStatus')){
+        const appStatus = mparam.get('appStatus');
+        if(appStatus === "OPEN") {
+            const button = document.getElementById("openfilterbutton");
+            button.setAttribute("aria-selected", "true");
+        }
+    }
+}
+
+async function initRubberRoom() {
+    try {
+        var scontainer = document.getElementsByClassName("scrims-container")[0];
+        const fet = await fetch(url);
+
+        if (!fet.ok) {
+            throw new Error(`HTTP error! Status: ${fet.status}`);
+        }
+
+        const scrims = await fet.json();
+        console.log(scrims);
+
+        for(let i = 0; i<scrims.length; i++) {
+            var scrim = scrims[i];
+            let sillybilly = document.createElement('div');
+            sillybilly.className = 'scrim-box';
+            sillybilly.id = `scrim-box-${scrim.identifier}`;
+            sillybilly.innerHTML =
+                `<div id="status" class="${scrim.appStatus}label">${scrim.appStatus}</div>
+                <a href="/scrim/${scrim.identifier}" target="_blank"> <div id="identifier">${scrim.identifier}</div></a>
+                <a href="/team/${scrim.organizer.teamNum}" target="_blank"> <div id="orgTeam">Org Team: ${scrim.organizer.teamNum}</div></a>
+                <div id="teams">Teams: ${scrims[i].teams.length}/${scrims[i].size}</div>
+                <div id="region">Region: ${scrim.region}</div>
+                <div id="city">City: ${scrim.location.city}, ${scrim.location.state}</div>
+                <div id="date">
+                    <div id="dateTag">
+                        Date:
+                    </div>
+                    <div id="dateTime">
+                        ${scrim.endTime.substring(0, 10)}
+                    </div>
+                </div>`;
+            scontainer.appendChild(sillybilly);
+        }
+    } catch (error) {//TODO ADDMINATIONS ADDIMIN ANIMATION SFAA
+        console.error("fahhh DDDDDD: ", error);
+    }
+}
+
+async function initGeemap() {
     const {InfoWindow} = await google.maps.importLibrary("maps");
     const [{ AdvancedMarkerElement }] = await Promise.all([
         google.maps.importLibrary('marker')
@@ -13,8 +87,6 @@ async function init() {
     innerMap.setOptions({
         mapTypeControl: true,
     });
-
-    const url = `http://localhost:8080/getScrims${location.search}`;
 
     try {
         const fet = await fetch(url);
@@ -44,7 +116,7 @@ async function init() {
                 boxbox.className = "openTags";
                 eeatbacon = "--open-status";
             } else {
-                boxbox.className = "closeTags";
+                boxbox.className = "closedTags";
                 eeatbacon = "--closed-status";
             }
 
@@ -94,4 +166,41 @@ async function init() {
     }
 }
 
-void init();
+function igotthescript() {
+    const ariaopenclose = document.getElementById("openfilterbutton").ariaSelected;
+    let openclose = "";
+    let searchstring = document.getElementById("scrimsearcher").value;
+    let regionstring = document.getElementById("regions").value;
+    let hasBefore = false;
+
+    if(ariaopenclose === "true") {
+        openclose = "appStatus=OPEN";
+        hasBefore = true;
+    }
+
+    if (!(regionstring === "")) {
+        if(hasBefore) {
+            regionstring = `&region=${regionstring}`;
+        } else {
+            regionstring = `region=${regionstring}`;
+        }
+        hasBefore = true;
+    }
+
+    if (!(searchstring === "")) {
+        if(hasBefore) {
+            searchstring=`&identifier=${searchstring}`;
+        } else {
+            searchstring=`identifier=${searchstring}`;
+        }
+    }
+
+    window.location.href = `/searchScrims?${openclose}${regionstring}${searchstring}`;
+}
+
+window.buttonClicked = buttonClicked;
+window.igotthescript = igotthescript;
+
+void initNutsAndBolts();
+void initRubberRoom();
+void initGeemap();

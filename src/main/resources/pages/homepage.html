@@ -26,7 +26,7 @@
         </div>
         <div class="homepage-section" id="live-container">
             <div id="upcoming-scrims-tag"> Upcoming Scrims </div>
-            <div class="scrims-container">
+            <div class="scrims-container" id="scrim-container"> <!--css slop </2 im gonna chungus out a small village in barbados-->
                 <div class="scrim-box" th:each="scrim: ${scrims}">
                     <div id="status" th:text="${scrim.applicationStatus}">status</div>
                     <div id="identifier" th:text="${scrim.getIdentifier()}">TNUMS-CityCityCityCity-DD-MM-YYYY</div>
