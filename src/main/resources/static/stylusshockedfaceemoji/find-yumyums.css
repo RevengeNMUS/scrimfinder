@@ -8,8 +8,10 @@
     --container-background: rgb(20,20,20);
     --container-border: rgb(25, 25, 25);
     --header-button-grey: rgb(40, 40, 40);
-    --inner-box-background: rgb(30, 30, 30);;
-    --inner-box-border: rgb(40, 40, 40);;
+    --inner-box-background: rgb(30, 30, 30);
+    --lightened-inner-box-background: rgb(37, 37, 37);
+    --inner-box-border: rgb(40, 40, 40);
+    --lightened-inner-box-border: rgb(47, 47, 47);
     --open-status: forestgreen;
     --closed-status: #df2c14;
     --header-text: whitesmoke;
@@ -183,10 +185,17 @@ body {
     font-family: Arial, ui-rounded;
 }
 
-.scrim-box > #status {
+.scrim-box > .OPENlabel {
+    color: var(--open-status);
     font-size: x-small;
     font-weight:900;
-    color: var(--open-status);
+    text-align: left;
+}
+
+.scrim-box > .CLOSEDlabel {
+    color: var(--closed-status);
+    font-size: x-small;
+    font-weight:900;
     text-align: left;
 }
 
@@ -224,11 +233,11 @@ body {
 }
 
 #live-container > #search-container {
-    height: 27vh
+    height: 15vh
 }
 
 #live-container > .scrims-container {
-    height: calc((73vh - 75px) - 100px);
+    height: calc((85vh - 75px) - 100px);
     display: flex;
     flex-direction: column;
     overflow: auto;
@@ -266,10 +275,17 @@ body {
     font-family: Arial, ui-rounded;
 }
 
-#live-container > .scrims-container > .scrim-box > #status {
+#live-container > .scrims-container > .scrim-box > .OPENlabel {
+    color: var(--open-status);
     font-size: x-small;
     font-weight:900;
-    color: var(--open-status);
+    text-align: left;
+}
+
+#live-container > .scrims-container > .scrim-box > .CLOSEDlabel {
+    color: var(--closed-status);
+    font-size: x-small;
+    font-weight:900;
     text-align: left;
 }
 
@@ -307,14 +323,119 @@ body {
     padding: 10px 10px;
 }
 
-
-#upcoming-scrims-tag {
-    margin: 10px;
-    font-family: Impact, serif;
-    font-size: x-large;
-    text-align: center;
-    color: var(--kurio-red);
-    overflow: hidden;
-    overflow-wrap: normal;
+#search-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
     align-items:center;
+    text-align: center;
+}
+
+#searchbar {
+    height: 5vh;
+    margin: 5px;
+    display: flex;
+    flex-direction: row;
+    background-color: whitesmoke;
+    border:5px solid var(--inner-box-border);
+    border-radius: 10px;
+}
+
+#searchbar > #scrimsearcher {
+    padding-left: 5px;
+    align-self: center;
+    justify-self: center;
+    height: calc(5vh - 5px);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border: none;
+    outline: none;
+    fill: var(--lightened-inner-box-background);
+}
+
+#filter-bar {
+    width: -webkit-fill-available;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-content: center;
+}
+
+
+#openfilterbutton[aria-selected="false"] {
+    margin: 2px;
+    padding: 5px 10px;
+    background-color: var(--lightened-inner-box-background);
+    border:5px solid var(--lightened-inner-box-border);
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+}
+
+#openfilterbutton[aria-selected="false"]:hover {
+    background-color: var(--inner-box-background);
+    border:5px solid var(--inner-box-border);
+    color: #e3e3e3;
+    font-weight: bold;
+}
+
+#openfilterbutton[aria-selected="true"] {
+    margin: 2px;
+    padding: 5px 10px;
+    background-color: var(--lightened-inner-box-background);
+    border:5px solid var(--open-status);
+    border-radius: 10px;
+    color: var(--open-status);
+    font-weight: bold;
+}
+
+#openfilterbutton[aria-selected="true"]:hover {
+    background-color: var(--inner-box-background);
+    border:5px solid #218321;
+    color: #218321;
+    font-weight: bold;
+}
+
+select {
+    margin: 2px;
+    padding: 5px 10px;
+    background-color: var(--lightened-inner-box-background);
+    border:5px solid var(--lightened-inner-box-border);
+    border-radius: 10px;
+    color: var(--fly);
+    font-weight: bold;
+}
+
+option {
+    margin: 2px;
+    padding: 2px 5px;
+    background-color: var(--lightened-inner-box-background);
+    border:5px solid var(--lightened-inner-box-border);
+    font-weight: normal;
+    color: var(--fly);
+    border-radius: 5px;
+}
+
+select:hover {
+    background-color: var(--inner-box-background);
+    border:5px solid var(--inner-box-border);
+    color: #e3e3e3;
+    font-weight: bold;
+}
+
+#submitbutton {
+    border: none;
+    outline: none;
+    fill: rgba(205, 205, 205, 0);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    align-content: center;
+    vertical-align: center;
+}
+
+#submitbutton {
+    background-image: url("static/spoinkydoinks/maglass.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }

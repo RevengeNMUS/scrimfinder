@@ -87,7 +87,7 @@ public class Main implements AutoCloseable{
         saveTeams();
         return true;
     }
-
+//todo update other pages to slime out thymeleaf
     public boolean deleteScrim(ScrimmageImpl scrim) throws IOException, InterruptedException, TimeoutException {
         boolean returnBool = scrims.remove(scrim);
         for (Team team : scrim.teamsInScrim()) {
@@ -234,7 +234,7 @@ public class Main implements AutoCloseable{
         throw new ResourceNotFoundException("Resource not found for team name " + tName);
     }
 
-    public static ArrayList<Team> findTeams(ArrayList<Team> teams, TeamSearch ts) throws ResourceNotFoundException {
+    public static ArrayList<Team> findTeams(ArrayList<Team> teams, TeamSearch ts) {
         var returnList = new ArrayList<Team>();
         for (Team team : teams) {
             if (ts.isFound(team)) {
@@ -244,19 +244,17 @@ public class Main implements AutoCloseable{
 
         if (returnList.isEmpty()) {
             //resort to throwing rotten tomatoes (exception) at user
-            throw new ResourceNotFoundException("No resources found for  " + ts.finderMethod());
+//          throw new ResourceNotFoundException("No resources found for  " + ts.finderMethod());
         }
 
         return returnList;
     }
 
-    public ArrayList<Team> findTeams(TeamSearch ts) throws ResourceNotFoundException {
+    public ArrayList<Team> findTeams(TeamSearch ts) {
         return findTeams(teams, ts);
     }
 
-
-
-    public ArrayList<ScrimmageImpl> findScrims(ScrimSearch ss) throws ResourceNotFoundException {
+    public ArrayList<ScrimmageImpl> findScrims(ScrimSearch ss) {
         var returnList = new ArrayList<ScrimmageImpl>();
 
         for (Scrimmage scrim : scrims) {
@@ -266,8 +264,8 @@ public class Main implements AutoCloseable{
         }
 
         if (returnList.isEmpty()) {
-            //resort to throwing rotten tomatoes (exception) at user
-            throw new ResourceNotFoundException("No resources found for  " + ss.finderMethod());
+            //resort to throwing rotten tomatoes at user
+//          throw new ResourceNotFoundException("No resources found for  " + ss.finderMethod());
         }
 
         return returnList;
@@ -283,8 +281,8 @@ public class Main implements AutoCloseable{
         }
 
         if (returnList.isEmpty()) {
-            //resort to throwing rotten tomatoes (exception) at user
-            throw new ResourceNotFoundException("No resources found for  " + ss.finderMethod());
+            //resort to throwing rotten tomatoes at user
+//          throw new ResourceNotFoundException("No resources found for  " + ss.finderMethod());
         }
 
         return returnList;

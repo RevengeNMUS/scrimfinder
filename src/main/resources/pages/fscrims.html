@@ -39,7 +39,7 @@
     </script>
     -->
     <script>
-        // prettier-ignore
+    // prettier-ignore
         (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
             key: "AIzaSyBndwE5U3xdTC9dochw9KrTgdbObujYH8E",
             v: "weekly"
@@ -61,31 +61,29 @@
     </div>
     <div id="homepage-container">
         <div class="homepage-section" id="live-container">
-            <div id="search-container">
-                <!--
-
-
-
-
-                -->
+            <div id="search-container" class="inner-container">
+               <form id="search-form" role="search">
+                   <div id="searchbar">
+                       <input id="scrimsearcher" type="text" placeholder="sus it up" name="identifier"> <!--todo: act do good searching you chud :sob:-->
+                       <button type="button" id="submitbutton" onclick="igotthescript()">
+                            <img id="maglass" th:src="@{/spoinkydoinks/maglass.jpg}" alt="maglass">
+                       </button>
+                   </div>
+                   <div id="filter-bar">
+                       <select name="region" id="regions">
+                           <option value="" id="ALL">All</option>
+                           <option value="NORCAL" id="NORCAL" >Norcal</option>
+                           <option value="SOCAL" id="SOCAL">Socal</option>
+                       </select>
+                       <div id="openfilter">
+                           <button type="button" onclick="buttonClicked('openfilterbutton')" id="openfilterbutton" aria-selected="false">
+                               Only Open
+                           </button>
+                       </div>
+                   </div>
+               </form>
             </div>
             <div class="scrims-container">
-                <div class="scrim-box" th:each="scrim: ${scrims}">
-                    <div id="status" th:text="${scrim.applicationStatus}">status</div>
-                    <a th:href="@{|/scrim/${scrim.getIdentifier()}|}" target="_blank"> <div id="identifier" th:text="${scrim.getIdentifier()}" >TNUMS-CityCityCityCity-DD-MM-YYYY</div></a>
-                    <a th:href="@{|/team/${scrim.organizer.teamNum}|}" target="_blank"> <div id="orgTeam" th:text="${scrim.organizer.teamNum}">Org Team: TNUMS</div></a>
-                    <div id="teams" th:text="'Teams: ' + ${scrim.teams.size()} + '/' + ${scrim.sizeLimit}">Teams: [N]/[N]</div>
-                    <div id="region" th:text="'Region: ' + ${scrim.region.getRegionCode()}">Region: [REGION]</div>
-                    <div id="city" th:text="'City: ' + ${scrim.location.city} + ', ' + ${scrim.location.state}">City: CityCityCityCity</div>
-                    <div id="date">
-                        <div id="dateTag">
-                            Date:
-                        </div>
-                        <div id="dateTime" th:text="${scrim.endTime.getMonthValue()} + '/' + ${scrim.endTime.getDayOfMonth()}">
-                            NA/NA
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="homepage-section" id="map">
