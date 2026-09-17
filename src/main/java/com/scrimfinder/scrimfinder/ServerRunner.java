@@ -23,6 +23,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -188,6 +190,9 @@ public class ServerRunner {
     public String team(Model model,
                        @NonNull @PathVariable int id) {
         try {
+            main.loadTeams();
+            main.loadScrims();
+
             Team team = null;
             team = main.findTeam(id);
             model.addAttribute("team", team);
@@ -206,10 +211,40 @@ public class ServerRunner {
             model.addAttribute("attscrims", atemp);
             model.addAttribute("team", team);
         } catch (ResourceNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.notFound().toString();
+        } catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().toString();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).toString();
         }
 
         return "team";
+    }
+
+    @GetMapping("/scrim/{idUnprocessed}")
+    public String scrim(Model model,
+                       @NonNull @PathVariable String idUnprocessed) {
+        try {
+            main.loadScrims();
+            main.loadTeams();
+
+            String id = URLDecoder.decode(idUnprocessed, StandardCharsets.UTF_8);
+
+            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(id)).getFirst();
+            model.addAttribute("scrim", scrim);
+
+            model.addAttribute("tInScrim", scrim.teamsInScrim());
+            model.addAttribute("orgTeam", scrim.organizer);
+
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().toString();
+        } catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().toString();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).toString();
+        }
+
+        return "scrim";
     }
 
     /**

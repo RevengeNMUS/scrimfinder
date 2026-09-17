@@ -182,7 +182,7 @@ public class Team {
     }
 
     public boolean attendeeFor(LimitedScrim scrimmage) {
-        if (!isAttending(scrimmage.identifier)) {
+        if (!isAttending(scrimmage.identifier) || isOrganizing(scrimmage.identifier)) {
             activeScrimmages.add(scrimmage);
             return true;
         }
