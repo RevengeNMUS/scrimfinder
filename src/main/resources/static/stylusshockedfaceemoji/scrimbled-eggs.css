@@ -1,0 +1,273 @@
+/* CSS styles */
+:root {
+    --kurio-red: #CF6A38;
+    --sharp-red: #CE5937;
+    --fein: #cd7149;
+    --fly: #FFFAFF;
+    --homepage-background: rgb(2,2,2);
+    --container-background: rgb(20,20,20);
+    --container-border: rgb(25, 25, 25);
+    --header-button-grey: rgb(40, 40, 40);
+    --inner-box-background: rgb(30, 30, 30);;
+    --inner-box-border: rgb(40, 40, 40);;
+    --open-status: forestgreen;
+    --closed-status: #df2c14;
+    --header-text: whitesmoke;
+    --non-header-text: #cdcdcd;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+body {
+    background-color: var(--homepage-background);
+    background-size: cover;
+    background-repeat: no-repeat;
+    user-select: text;
+    display: flex;
+    flex-direction: column;
+    height: 96vh;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#site-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height:50px;
+}
+
+#site-header > div{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#site-header > #site-buttons-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    align-items:center;
+}
+
+#logo-image {
+    border-radius: 15px;
+    margin-left: 15px;
+    margin-right:15px;
+    position: relative;
+    left: 1px;
+    top: 2px;
+}
+
+.header-box {
+    font-family: Arial, ui-rounded;
+    font-weight: 800;
+    padding: 10px 15px;
+    margin-left: 10px;
+    margin-right:10px;
+    color: var(--fein);
+    position: relative;
+    left: -1px;
+    top: -2px;
+    box-shadow: 1px 2px;
+    background-color: var(--header-button-grey);
+    border-radius:10px;
+    border-color: var(--fein);
+    border-style: solid;
+}
+
+.header-box:hover {
+    cursor: pointer;
+    box-shadow: 0px 0px;
+    background-color: rgb(50,50,50);
+    position: relative;
+    left: 0px;
+    top: 0px;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#site-footer {
+    display: flex;
+    height:32px;
+    flex-direction: row;
+    justify-content:space-evenly;
+    align-items:center;
+    font-size: smaller;
+    color: var(--fein);
+    user-select: text;
+}
+
+#site-footer > div > a {
+    font-size: small;
+    color: dodgerblue;
+    text-decoration: none;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#main-homepage-container {
+    margin: 0.5em 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-content: space-evenly;
+
+    * {
+        margin: 0.5em 0;
+    }
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#titles-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    text-align: center;
+    align-items: center;
+}
+
+.side-titles, #middle-title-container {
+/*    padding: 1rem 1.5rem; */
+    color: var(--fein);
+}
+
+#middle-title-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#main-homepage-container > #titles-box > #middle-title-container > #identifier {
+    margin: 10px;
+    font-family: Impact, serif;
+    font-size: 5rem;
+    text-align: center;
+    overflow: hidden;
+    overflow-wrap: normal;
+    align-items:center;
+}
+
+#date {
+    margin: 10px;
+    align-content: center;
+    font-size: large;
+    font-family: Arial, ui-rounded;
+    overflow: hidden;
+    overflow-wrap: normal;
+    text-align: center;
+}
+
+.side-titles {
+    font-size: x-large;
+    font-weight: 700;
+    font-family: Arial, ui-rounded;
+    color: var(--fein);
+    margin: 15px;
+    text-align: center;
+    overflow: hidden;
+    overflow-wrap: normal;
+    align-items:center;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#extras-box {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    flex: 1;
+
+    * {
+        margin: 0 0.5em;
+    }
+}
+
+#lock-title, #teams-title {
+    font-weight: 700;
+    font-family: Arial, ui-rounded;
+    color: var(--fein);
+    align-self: baseline;
+    justify-self: left;
+    padding: 0.25em;
+    margin: 0.25em;
+}
+
+#lock-title {
+    font-size: medium;
+}
+
+#teams-title {
+    font-size: x-large;
+}
+
+/*===================================================*/
+
+#teamsbox {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    overflow-y: auto;
+}
+
+.t-num-box {
+    color: var(--non-header-text);
+    font-style: normal;
+    font-size: 2em;
+    place-self: center;
+    padding: 1em 2em;
+}
+
+#oteam {
+    font-weight: 600;
+}
+
+/*===================================================*/
+
+#addr-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#adderatttag, #adder {
+    font-family: Arial, ui-rounded;
+    font-size: x-large;
+    color: var(--fein);
+    font-weight: 550;
+    text-decoration: none;
+}
+
+#addr-box {
+    flex: 1;
+    fill: #CE5937;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+[data-container-boxing] {
+    border: 3px solid var(--container-border);
+    box-shadow: 3px 3px var(--container-border);
+    border-radius: 10px;
+    background-color: var(--container-background);
+}
+
+/* IWFHIUWEHFwejfioBDIFOIwheikj.FKOKEBFoiWJEKFHoi,dHfikjlDSUFHUIhifuh9AIFuihseuifbSUIFhoiADFSO slop <2*/
+.t-num-box, div[data-subelement-boxing="true"] {
+    background-color: var(--inner-box-background);
+    border:5px solid var(--inner-box-border);
+    box-shadow: 5px 5px var(--inner-box-border);
+    border-radius: 10px;
+}
+
+
+[data-appstatus="OPEN"] {
+    color: var(--open-status);
+}
+
+[data-appstatus="CLOSED"] {
+    color: var(--closed-status)
+}

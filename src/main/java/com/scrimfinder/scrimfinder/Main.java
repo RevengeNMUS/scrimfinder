@@ -76,6 +76,9 @@ public class Main implements AutoCloseable{
         if (!scrims.contains(scrim)) {
             scrims.add(scrim);
         }
+
+        scrim.organizer.organizerFor(scrim.toLimitedScrim());
+
         for (Team team : scrim.teamsInScrim()) {
             if (!teams.contains(team)) {
                 teams.add(team);
@@ -94,7 +97,7 @@ public class Main implements AutoCloseable{
             team.notAttending(scrim.toLimitedScrim());
         }
 
-        scrim.organizer.notAttending(scrim.toLimitedScrim());
+        scrim.organizer.notOrganizing(scrim.toLimitedScrim());
 
         scrim.deleteFile();
         saveScrims();
