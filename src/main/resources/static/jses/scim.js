@@ -45,17 +45,27 @@ async function getTemu() {
 
     document.getElementById("adder").innerText = `${feetFarm.location.address}, ${feetFarm.location.city}, ${feetFarm.location.state}`;
     document.getElementById("adderatttag").setAttribute("href", `https://maps.google.com/?ll=${feetFarm.location.latitude},${feetFarm.location.longitude}`);
+
+    startgeemap(feetFarm.location.latitude,feetFarm.location.longitude);
 }
 
 async function startgeemap(lat, long) {
-    const {InfoWindow} = await google.maps.importLibrary("maps");
     const [{ AdvancedMarkerElement }] = await Promise.all([
         google.maps.importLibrary('marker')
     ]);
 
+    const mapElement = document.querySelector('gmp-map');
+
     const map = mapElement.innerMap;
 
+    mapElement.setAttribute("center", `${lat},${long}`)
 
+    new AdvancedMarkerElement({
+        title: 'Scim :0',
+        map: map,
+        position: {lat: lat, lng: long},
+        gmpClickable: true,
+    })
 }
 
 void getTemu();

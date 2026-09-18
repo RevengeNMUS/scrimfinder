@@ -100,6 +100,7 @@ async function initGeemap() {
 
         for(let i = 0; i<scrims.length; i++) {
             console.log("\t", {lat: Number(scrims[i].location.latitude), lng: Number(scrims[i].location.longitude)});
+
             const marker = new AdvancedMarkerElement({
                 map: innerMap,
                 position: {lat: Number(scrims[i].location.latitude), lng: Number(scrims[i].location.longitude)},

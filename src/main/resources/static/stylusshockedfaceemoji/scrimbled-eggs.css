@@ -181,10 +181,10 @@ body {
     display: grid;
     grid-template-columns: 2fr 1fr;
     flex: 1;
+}
 
-    * {
-        margin: 0 0.5em;
-    }
+#extras-box > div {
+    margin: 0 0.5em;
 }
 
 #lock-title, #teams-title {
@@ -238,11 +238,23 @@ body {
     color: var(--fein);
     font-weight: 550;
     text-decoration: none;
+    justify-self: left;
+    align-self: center;
+    margin: 2px;
+    padding: 2px;
 }
 
-#addr-box {
-    flex: 1;
-    fill: #CE5937;
+#lock-title {
+    justify-self: left;
+}
+
+gmp-map {
+    width: 90%;
+    border-radius: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    align-self: center;
+    justify-self: left;
 }
 
 /*===================================================*/
