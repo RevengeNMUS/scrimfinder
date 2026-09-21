@@ -1,0 +1,146 @@
+:root {
+    --kurio-red: #CF6A38;
+    --sharp-red: #CE5937;
+    --fein: #cd7149;
+    --fly: #FFFAFF;
+    --homepage-background: rgb(2,2,2);
+    --container-background: rgb(20,20,20);
+    --container-border: rgb(25, 25, 25);
+    --header-button-grey: rgb(40, 40, 40);
+    --inner-box-background: rgb(30, 30, 30);;
+    --inner-box-border: rgb(40, 40, 40);;
+    --open-status: forestgreen;
+    --closed-status: #df2c14;
+    --header-text: whitesmoke;
+    --non-header-text: #cdcdcd;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+body {
+    background-color: var(--homepage-background);
+    background-size: cover;
+    background-repeat: no-repeat;
+    user-select: text;
+    display: flex;
+    flex-direction: column;
+    height: 96vh;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#total-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#back-button {
+    margin: 5%;
+    height: 50px;
+    width: 50px;
+    justify-self: start;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#main-login-container {
+    display: flex;
+    flex-direction: column;
+    margin: 2%;
+}
+
+#title {
+    color: var(--fly);
+    margin: 10px 25%;
+    font-family: sans-serif;
+    font-weight:700;
+    font-size: 3rem;
+    align-self: center;
+    overflow: hidden;
+    overflow-wrap: normal;
+    align-items:center;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#buttons-box {
+    display: flex;
+    overflow-y: scroll;
+    flex-direction: column;
+    margin: 10px;
+    flex: 1;
+}
+
+.login-buttons {
+    margin: 2%;
+    flex: 1 0 calc(50px + 2%);
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#logo {
+    justify-self: end;
+    margin: 10%;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+[data-container-boxing] {
+    border: 3px solid var(--container-border);
+    box-shadow: 3px 3px var(--container-border);
+    border-radius: 10px;
+    background-color: var(--container-background);
+}
+
+/* IWFHIUWEHFwejfioBDIFOIwheikj.FKOKEBFoiWJEKFHoi,dHfikjlDSUFHUIhifuh9AIFuihseuifbSUIFhoiADFSO slop <2*/
+div[data-subelement-boxing="true"] {
+    background-color: var(--inner-box-background);
+    border:5px solid var(--inner-box-border);
+    box-shadow: 5px 5px var(--inner-box-border);
+    border-radius: 10px;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+button {
+    cursor: pointer;
+}
+
+button, .login-buttons {
+    font-family: Arial, ui-rounded;
+    font-weight: 800;
+    padding: 10px 15px;
+    margin-left: 10px;
+    margin-right:10px;
+    color: var(--fein);
+    position: relative;
+    left: -1px;
+    top: -2px;
+    box-shadow: 1px 2px rgb(30, 30, 30);;
+    background-color: var(--header-button-grey);
+    border-radius:10px;
+    border-color: rgb(30, 30, 30);
+    border-style: solid;
+}
+
+button:hover, .login-buttons:hover {
+    cursor: pointer;
+    box-shadow: 0px 0px;
+    background-color: rgb(50,50,50);
+    position: relative;
+    left: 0px;
+    top: 0px;
+}

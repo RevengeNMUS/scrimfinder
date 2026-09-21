@@ -62,9 +62,9 @@ async function startgeemap(lat, long) {
 
     new AdvancedMarkerElement({
         title: 'Scim :0',
-        map: map,
+        map: map, //todo genuinely ohw the hel are we doing join scrims
         position: {lat: lat, lng: long},
-        gmpClickable: true,
+        gmpClickable: true
     })
 }
 

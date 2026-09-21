@@ -3,6 +3,7 @@ package com.scrimfinder.scrimfinder;
 import com.scrimfinder.EDC.ApplicationStatus;
 import com.scrimfinder.EDC.Region;
 import com.scrimfinder.SearchMethods.*;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -15,6 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -247,6 +252,27 @@ public class ServerRunner {
         return "scrim";
     }
 
+    @GetMapping("/auth-page")
+    public String login(Model model) {
+        return "auth-page";
+    }
+
+    @GetMapping("/manageScrims")
+    public String mScrims(Model model) {
+        try {
+            main.loadScrims();
+            main.loadTeams();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().toString();
+        } catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().toString();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).toString();
+        }
+
+        return "manageScrims";
+    }
+
     /**
      * WEIRDLY NAMED
      * but updates team to attend a scrim
@@ -257,9 +283,14 @@ public class ServerRunner {
     @PutMapping("/teamJoinScrim/{id}")
     ResponseEntity<Boolean> tJoinScrim(
             @NonNull @PathVariable int id,
-            @NonNull @RequestParam(value = "scrimID") String scrimID
+            @NonNull @RequestParam(value = "scrimID") String scrimID,
+            Principal principal
     ) {
         try {
+            if (principal.getName() == null) {//todo aaddstuff
+                return ResponseEntity.status(403).build();
+            }
+
             main.loadTeams();
             main.loadScrims();
 
@@ -288,6 +319,7 @@ public class ServerRunner {
             @NonNull @RequestParam(value = "scrimID") String scrimID
     ) {
         try {
+
             main.loadTeams();
             main.loadScrims();
 
@@ -468,6 +500,11 @@ public class ServerRunner {
         }
     }
 
+    @GetMapping("/authName")
+    ResponseEntity<JsonNode> authName(@AuthenticationPrincipal OAuth2User principal) {
+        return ResponseEntity.ok(oMapper.createObjectNode().putPOJO("name", principal.getAttribute("name")));
+    }
+
     //TODO HOLY CRIMES YOU NEED TO DOCUMENT
     @RequestMapping(value = "/getTeams", method = RequestMethod.GET)
     ResponseEntity<JsonNode> getTeams(
@@ -577,10 +614,6 @@ TS CODE EMBARRESED ME INFRONT OF A META DEV AIFHEiuAFNHEOEFBouoIAEFbuhEHfiWPFEHu
     }
 
     public static void main(String[] args) {
-        try (var main = new Main()) {
-            SpringApplication.run(ServerRunner.class, args);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        SpringApplication.run(ServerRunner.class, args);
     }
 }

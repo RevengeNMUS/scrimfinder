@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scrimfinder - Login</title>
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/treein.css}"/>
+    <script type="module" th:src="@{/jses/login.js}"></script>
+</head>
+<body th:style="|background-image:url(@{/spoinkydoinks/homepagebackgroundperhaps.png});|">
+<div id="total-container">
+    <button id="back-button" onclick="backback()">
+
+    </button>
+    <div id="main-login-container" data-container-boxing="true">
+        <div id="title">
+            Login
+        </div>
+        <div id="buttons-box" data-container-boxing="true">
+            <button class="login-buttons" id="google-button" data-container-boxing="true" onclick="authGoogle()">
+                Log in with
+                <img th:src="@{/spoinkydoinks/glogo.png}" alt="gicon" width="50" height="50" style="vertical-align: middle;">
+            </button>
+            <button class="login-buttons" id="guthib-button" data-container-boxing="true" onclick="authGit()">
+                Log in with
+                <img th:src="@{/spoinkydoinks/gitlogo.png}" alt="gicon" width="50" height="50" style="vertical-align: middle;">
+            </button>
+        </div>
+    </div>
+    <div id="logo">
+        <a href="homepage"><img id="logo-image" th:src="@{spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a>
+    </div>
+</div>
+</body>
+</html>
