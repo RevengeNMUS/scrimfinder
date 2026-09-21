@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="|Scrimfinder - ${scrim.identifier}|">Scrimfinder -</title>
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/scrimbled-eggs.css}">
+    <script type="module" th:src="@{/jses/scim.js}"></script>
+</head>
+<body th:style="|background-image:url(@{/spoinkydoinks/homepagebackgroundperhaps.png});|">
+<div id="site-header" data-container-boxing="true">
+    <div id="site-logo-header">
+        <div><a href="/dashboard"><img id="logo-image" th:src="@{/spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
+    </div>
+    <div id="site-buttons-header">
+        <div><a href='/searchScrims'><button class="header-box" id="findScrims">Find Scrimmages</button></a></div>
+        <div><a th:href="amongus.com"><button class="header-box" id="login-signup"> Login/Sign Up </button></a></div>
+    </div>
+</div>
+
+<div id="main-homepage-container">
+    <div id="titles-box" data-container-boxing="true">
+        <div class="side-titles" id="region">
+
+        </div>
+        <div id="middle-title-container">
+            <div id="identifier">
+
+            </div>
+            <div id="date">
+
+            </div>
+        </div>
+        <div class="side-titles" id="status">
+
+        </div>
+    </div>
+    <div id="extras-box">
+        <div id="teams-container" data-container-boxing="true">
+            <div id="teams-title">
+                Teams
+            </div>
+            <div id="teamsbox">
+                <!-- WOWWWWWWW THERES SO MANY TEAMS HERE AMAZING-->
+            </div>
+        </div>
+        <div id="addr-container" data-container-boxing="true">
+            <div id="lock-title">
+                Address:
+            </div>
+            <a id="adderatttag">
+                <div id="adder">
+
+                </div>
+            </a>
+            <gmp-map id="sillylilmap" center="-25.344,131.031" zoom="7" map-id="8444e43957e825dbbe3e563f">
+            </gmp-map>
+        </div>
+    </div>
+</div>
+
+<footer id="site-footer" data-container-boxing="true">
+    <div class="footer-text">Created by Kuriosity Robotics, 12635</div>
+    <div class="footer-text">Reach out at <a href="mailto:kuriosityrobotics@gmail.com">kuriosityrobotics@gmail.com</a></div>
+</footer>
+
+</body>
+</html>

@@ -79,10 +79,11 @@ async function initGeeMap() {
             key: yummykey,
             v: "weekly"
         });
+
+        void getTemu();
     } catch (error) {
         console.error("Failed to initialize Google Maps:", error);
     }
 }
 
 void initGeeMap();
-void getTemu();
