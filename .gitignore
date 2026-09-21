@@ -36,3 +36,4 @@ bin/
 scrimmages/
 teams/
 *.iml
+*.properties
