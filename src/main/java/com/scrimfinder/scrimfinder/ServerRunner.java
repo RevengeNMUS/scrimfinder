@@ -6,6 +6,7 @@ import com.scrimfinder.SearchMethods.*;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -503,6 +504,13 @@ public class ServerRunner {
     @GetMapping("/authName")
     ResponseEntity<JsonNode> authName(@AuthenticationPrincipal OAuth2User principal) {
         return ResponseEntity.ok(oMapper.createObjectNode().putPOJO("name", principal.getAttribute("name")));
+    }
+
+    @Value("${app.custom.api.gmap}")
+    private String apiUrl;
+    @GetMapping("/gmapApi")
+    ResponseEntity<JsonNode> gmapApi() {
+        return ResponseEntity.ok(oMapper.createObjectNode().putPOJO("url", apiUrl));
     }
 
     //TODO HOLY CRIMES YOU NEED TO DOCUMENT
