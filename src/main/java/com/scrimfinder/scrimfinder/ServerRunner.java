@@ -3,12 +3,10 @@ package com.scrimfinder.scrimfinder;
 import com.scrimfinder.EDC.ApplicationStatus;
 import com.scrimfinder.EDC.Region;
 import com.scrimfinder.SearchMethods.*;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -25,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,8 +38,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.scrimfinder.SearchMethods.SearchFactory.PARSER;
 import static com.scrimfinder.scrimfinder.MainConstants.*;
@@ -51,13 +51,14 @@ import static com.scrimfinder.scrimfinder.MainConstants.*;
 @Controller
 //@RequestMapping("srimfinder/api/v1")
 public class ServerRunner {
-    Main main;
+    Main mane;
     ObjectMapper oMapper;
+    ReentrantReadWriteLock rrwl = new ReentrantReadWriteLock();
 
     @Scheduled(cron = "59 59 * * * *")
     public void hourlyUpdate() {
         try{
-            main.removeOutdatedScrims();
+            mane.removeOutdatedScrims();
         } catch (Exception e) {
             //cope :sob: go get a blt twin go rn rn go GO
         }
@@ -66,18 +67,18 @@ public class ServerRunner {
     @Autowired
     public ServerRunner(ObjectMapper objectMapper, Main m) throws IOException, InterruptedException, TimeoutException {
         oMapper = objectMapper;
-        main = m;
-        main.loadScrims();
-        main.loadTeams();
+        mane = m;
+        mane.loadScrims();
+        mane.loadTeams();
     }
 
     @GetMapping("/homepage")
     public String homepage(Model model) {
         try {
-            main.loadTeams();
-            main.loadScrims();
+            mane.loadTeams();
+            mane.loadScrims();
 
-            ArrayList<ScrimmageImpl> scrims = main.findScrims(SearchFactory.buildScrimSearch());
+            ArrayList<ScrimmageImpl> scrims = mane.findScrims(SearchFactory.buildScrimSearch());
             scrims.sort(Comparator.comparing(o -> o.endTime));
             List<ScrimmageImpl> top_scrims = scrims.subList(0, Math.min(6, scrims.size()));
 
@@ -92,7 +93,7 @@ public class ServerRunner {
             model.addAttribute("scrims", top_scrims);
             model.addAttribute("total_scrims", scrims);
             model.addAttribute("cities_represented", cities.size());
-            model.addAttribute("teams", main.findTeams(SearchFactory.buildTeamSearch()));
+            model.addAttribute("teams", mane.findTeams(SearchFactory.buildTeamSearch()));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().toString();
         } catch (IOException | InterruptedException e) {
@@ -107,10 +108,10 @@ public class ServerRunner {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         try {
-            main.loadTeams();
-            main.loadScrims();
+            mane.loadTeams();
+            mane.loadScrims();
 
-            ArrayList<ScrimmageImpl> scrims = main.findScrims(SearchFactory.buildScrimSearch());
+            ArrayList<ScrimmageImpl> scrims = mane.findScrims(SearchFactory.buildScrimSearch());
             scrims.sort(Comparator.comparing(o -> o.endTime));
             List<ScrimmageImpl> top_scrims = scrims.subList(0, Math.min(6, scrims.size()));
 
@@ -125,7 +126,7 @@ public class ServerRunner {
             model.addAttribute("scrims", top_scrims);
             model.addAttribute("total_scrims", scrims);
             model.addAttribute("cities_represented", cities.size());
-            model.addAttribute("teams", main.findTeams(SearchFactory.buildTeamSearch()));
+            model.addAttribute("teams", mane.findTeams(SearchFactory.buildTeamSearch()));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().toString();
         } catch (IOException | InterruptedException e) {
@@ -148,10 +149,10 @@ public class ServerRunner {
                           @RequestParam(value = "appStatus", required = false) String appStatus)
     {
         try {
-            main.loadScrims();
-            main.loadTeams();
+            mane.loadScrims();
+            mane.loadTeams();
 
-            var fullList = main.findScrims(SearchFactory.SCRIM_DEFAULT);
+            var fullList = mane.findScrims(SearchFactory.SCRIM_DEFAULT);
             Region reg = region != null ? Region.valueOf(region) : null;
             var regionList = Main.findScrims(fullList, SearchFactory.buildScrimSearch(reg));
 
@@ -196,11 +197,11 @@ public class ServerRunner {
     public String team(Model model,
                        @NonNull @PathVariable int id) {
         try {
-            main.loadTeams();
-            main.loadScrims();
+            mane.loadTeams();
+            mane.loadScrims();
 
             Team team = null;
-            team = main.findTeam(id);
+            team = mane.findTeam(id);
             model.addAttribute("team", team);
 
             ArrayList<ScrimmageImpl> otemp = new ArrayList<>();
@@ -231,12 +232,12 @@ public class ServerRunner {
     public String scrim(Model model,
                        @NonNull @PathVariable String idUnprocessed) {
         try {
-            main.loadScrims();
-            main.loadTeams();
+            mane.loadScrims();
+            mane.loadTeams();
 
             String id = URLDecoder.decode(idUnprocessed, StandardCharsets.UTF_8);
 
-            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(id)).getFirst();
+            ScrimmageImpl scrim = mane.findScrims(SearchFactory.buildScrimSearch(id)).getFirst();
             model.addAttribute("scrim", scrim);
 
             model.addAttribute("tInScrim", scrim.teamsInScrim());
@@ -258,11 +259,17 @@ public class ServerRunner {
         return "auth-page";
     }
 
+
+    @GetMapping("/homepage-redir")
+    String homepageredir(Model model) {
+        return "homepage-redir";
+    }
+
     @GetMapping("/manageScrims")
     public String mScrims(Model model) {
         try {
-            main.loadScrims();
-            main.loadTeams();
+            mane.loadScrims();
+            mane.loadTeams();
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().toString();
         } catch (IOException | InterruptedException e) {
@@ -285,21 +292,24 @@ public class ServerRunner {
     ResponseEntity<Boolean> tJoinScrim(
             @NonNull @PathVariable int id,
             @NonNull @RequestParam(value = "scrimID") String scrimID,
-            Principal principal
+            @AuthenticationPrincipal OAuth2User principal
     ) {
         try {
-            if (principal.getName() == null) {//todo aaddstuff
+
+            if (getUserInfo0(principal).getTeamNum() != (id))
                 return ResponseEntity.status(403).build();
-            }
-
-            main.loadTeams();
-            main.loadScrims();
-
-            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
-            Team team = main.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
 
 
-            return ResponseEntity.ok(main.joinScrim(team, scrim));
+            mane.loadTeams();
+            mane.loadScrims();
+
+            ScrimmageImpl scrim = mane.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
+            Team team = mane.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
+
+
+            return ResponseEntity.ok(mane.joinScrim(team, scrim));
+        } catch (AuthorizationDeniedException e) {
+            return ResponseEntity.status(403).build();
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (IOException | TimeoutException | InterruptedException e) {
@@ -317,23 +327,56 @@ public class ServerRunner {
     @PutMapping("/teamLeaveScrim/{id}")
     ResponseEntity<Boolean> tLeaveScrim(
             @NonNull @PathVariable int id,
-            @NonNull @RequestParam(value = "scrimID") String scrimID
+            @NonNull @RequestParam(value = "scrimID") String scrimID,
+            @AuthenticationPrincipal OAuth2User principal
     ) {
         try {
+            mane.loadTeams();
+            mane.loadScrims();
 
-            main.loadTeams();
-            main.loadScrims();
+            ScrimmageImpl scrim = mane.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
+            Team team = mane.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
 
-            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
-            Team team = main.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
+            if (getUserInfo0(principal).getTeamNum() != (id))
+                return ResponseEntity.status(403).build();
 
-            return ResponseEntity.ok(main.leaveScrim(team, scrim));
+            return ResponseEntity.ok(mane.leaveScrim(team, scrim));
+        } catch (AuthorizationDeniedException e) {
+            return ResponseEntity.status(403).build();
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (IOException | TimeoutException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+
+    @PostMapping(value = "/createUser")
+    ResponseEntity<Boolean> createUser(@RequestBody JsonNode jNode) {
+        try {
+            if (!rrwl.writeLock().tryLock(1000, TimeUnit.MILLISECONDS)) {
+                throw new TimeoutException("Timeout");
+            }
+
+            File file = new File("src/main/resources/plsnolook/users.json");
+
+            var team = Team.handleCreation(jNode);
+            ObjectNode smthsmth = oMapper.readTree(file).asObject();
+            smthsmth.put(jNode.get("loginUser").asString(), team.getTeamNum());
+
+            oMapper.writerWithDefaultPrettyPrinter().writeValue(file, smthsmth);
+            team.saveToFile();
+        } catch (IOException e) {
+            return ResponseEntity.status(418).build();
+        } catch (InterruptedException | TimeoutException e) {
+            return ResponseEntity.status(500).build();
+        } finally {
+            rrwl.writeLock().unlock();
+        }
+
+        return ResponseEntity.ok(true);
+    }
+
 
     @PostMapping(value = "/createTeam")
     ResponseEntity<Boolean> createTeam(@RequestBody JsonNode jNode) {
@@ -355,12 +398,27 @@ public class ServerRunner {
      * @return whether it was successfully created (or an error)
      */
     @PostMapping(value = "/createScrim")
-    ResponseEntity<Boolean> createScrim(@RequestBody JsonNode jNode) {
+    ResponseEntity<Boolean> createScrim(
+            @RequestBody JsonNode jNode,
+            @AuthenticationPrincipal OAuth2User principal) {
         try {
+            mane.loadScrims();
+            mane.loadTeams();
+
             var scrim = ScrimmageImpl.fromJNode(jNode);
+            if (getUserInfo0(principal).equals(scrim.organizer))
+                return ResponseEntity.status(403).build();
+
             scrim.saveToFile();
-        } catch (IOException e) {
-            return ResponseEntity.status(418).build();
+
+            mane.loadTeams();
+            mane.loadScrims();
+        } catch (AuthorizationDeniedException e) {
+            return ResponseEntity.status(403).build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            return ResponseEntity.internalServerError().build();
         }
 
         return ResponseEntity.ok(true);
@@ -380,12 +438,16 @@ public class ServerRunner {
             @NonNull @PathVariable String scrimID,
             @RequestParam(value = "region", required = false) String region,
             @RequestParam(value = "appStatus", required = false) String appStatus,
-            @RequestParam(value = "size", required = false) Integer size) {
+            @RequestParam(value = "size", required = false) Integer size,
+            @AuthenticationPrincipal OAuth2User principal) {
         try {
-            main.loadScrims();
+            mane.loadScrims();
 //          scrimID = scrimID.replace("%20", " ");
-            ScrimmageImpl scrim = main.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
+            ScrimmageImpl scrim = mane.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
             ScrimmageImpl updatedScrim = new ScrimmageImpl(scrim);
+
+            if (!getUserInfo0(principal).equals(updatedScrim.organizer))
+                return ResponseEntity.status(403).build();
 
             if (region != null) {
                 scrim.setRegion(Region.fromCode(region));
@@ -399,7 +461,9 @@ public class ServerRunner {
                 scrim.setSizeLimit(size);
             }
 
-            main.updateScrim(scrim, updatedScrim);
+            mane.updateScrim(scrim, updatedScrim);
+        } catch (AuthorizationDeniedException e) {
+            return ResponseEntity.status(403).build();
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (IOException | TimeoutException | InterruptedException e) {
@@ -421,10 +485,15 @@ public class ServerRunner {
             @NonNull @PathVariable int id,
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "email", required = false) String email,
-            @RequestParam(value = "region", required = false) String region) {
+            @RequestParam(value = "region", required = false) String region,
+            @AuthenticationPrincipal OAuth2User principal) {
         try {
-            main.loadTeams();
-            Team oldTeam = main.findTeam(id);
+            if (getUserInfo0(principal).getTeamNum() != (id))
+                return ResponseEntity.status(403).build();
+
+
+            mane.loadTeams();
+            Team oldTeam = mane.findTeam(id);
             Team newTeam = new Team(oldTeam);
 
             if (region != null) {
@@ -439,7 +508,9 @@ public class ServerRunner {
                 newTeam.setEmail(email);
             }
 
-            main.updateTeam(oldTeam, newTeam);
+            mane.updateTeam(oldTeam, newTeam);
+        } catch (AuthorizationDeniedException e) {
+            return ResponseEntity.status(403).build();
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
@@ -468,7 +539,7 @@ public class ServerRunner {
             //add loc?
     {
         try {
-            var fullList = main.findScrims(SearchFactory.SCRIM_DEFAULT);
+            var fullList = mane.findScrims(SearchFactory.SCRIM_DEFAULT);
             Region reg = region != null ? Region.valueOf(region) : null;
             var regionList = Main.findScrims(fullList, SearchFactory.buildScrimSearch(reg));
 
@@ -506,6 +577,88 @@ public class ServerRunner {
         return ResponseEntity.ok(oMapper.createObjectNode().putPOJO("name", principal.getAttribute("name")));
     }
 
+    @GetMapping("/authcheck")
+    ResponseEntity<JsonNode> checkLogin(@AuthenticationPrincipal OAuth2User principal) {
+        try {
+            principal.getAttribute("name"); //scuffed, but should trhwo error
+            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", true));
+        } catch (NullPointerException e) {
+            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", false));
+        }
+    }
+
+    @GetMapping("/new-user-check")
+    ResponseEntity<JsonNode> checkNewUser (@AuthenticationPrincipal OAuth2User principal) {
+        try {
+            rrwl.readLock().lock();
+            String name = principal.getAttribute("name"); //scuffed, but should trhwo error
+
+            JsonNode jsonNode = oMapper.readTree("src/main/resources/plsnolook/users.json");
+
+            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", true).put("new-user", !jsonNode.has(name)));
+        } catch (NullPointerException e) {
+            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", false));
+        } finally {
+            rrwl.readLock().unlock();
+        }
+    }
+
+    @GetMapping("/getUserInfo")
+    ResponseEntity<JsonNode> getUserInfo (@AuthenticationPrincipal OAuth2User principal) {
+        try {
+            mane.loadTeams();
+            mane.loadScrims();
+
+            rrwl.readLock().lock();
+
+            String name = principal.getAttribute("name"); //scuffed, but should trhwo error
+            if (name == null || name.isEmpty()) {
+                return ResponseEntity.ok(oMapper.createObjectNode().put("authed", false));
+            }
+
+            JsonNode jsonNode = oMapper.readTree("src/main/resources/plsnolook/users.json");
+
+            Team team = mane.findTeam(jsonNode.get(name).asInt());
+
+            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", true).putPOJO("user", team));
+        } catch (NullPointerException e) {
+            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", false));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().build();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).build();
+        } finally {
+            rrwl.readLock().unlock();
+        }
+    }
+
+    private Team getUserInfo0 (@AuthenticationPrincipal OAuth2User principal) throws AuthorizationDeniedException, RuntimeException{
+        try {
+
+            mane.loadTeams();
+            mane.loadScrims();
+
+            rrwl.readLock().lock();
+
+            String name = principal.getAttribute("name"); //scuffed, but should trhwo error
+            if (name == null || name.isEmpty()) {
+                throw new AuthorizationDeniedException("User not authenticated");
+            }
+            JsonNode jsonNode = oMapper.readTree("src/main/resources/plsnolook/users.json");
+
+            return mane.findTeam(jsonNode.get(name).asInt());
+
+        } catch (NullPointerException e) {
+            throw new AuthorizationDeniedException(e.toString());
+        } catch (Exception e) {
+            throw new RuntimeException(e.toString());
+        } finally {
+            rrwl.readLock().unlock();
+        }
+    }
+
     @Value("${app.custom.api.gmap}")
     private String apiUrl;
     @GetMapping("/gmapApi")
@@ -523,9 +676,9 @@ public class ServerRunner {
             @RequestParam(value = "activeScrims", required = false) String aScrim)
     {
         try {
-            main.saveTeams();
+            mane.saveTeams();
 
-            var fullList = main.findTeams(SearchFactory.TEAM_DEFAULT);
+            var fullList = mane.findTeams(SearchFactory.TEAM_DEFAULT);
             Region reg = region != null ? Region.valueOf(region) : null;
             var regionList = Main.findTeams(fullList, SearchFactory.buildTeamSearch(reg));
             Integer team = tNum != null ? Integer.parseInt(tNum) : null;
@@ -540,6 +693,8 @@ public class ServerRunner {
             }
 
             return ResponseEntity.ok(arNode);
+        } catch (AuthorizationDeniedException e) {
+            return ResponseEntity.status(403).build();
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).build();
         } catch (IOException | InterruptedException | TimeoutException e) {
@@ -563,7 +718,7 @@ public class ServerRunner {
 
     @RequestMapping("/")
     String explode() {
-        return "Explodes mind with MIND";
+        return "ExplodesmindwithMIND";
     }
 
 /*
@@ -587,24 +742,40 @@ TS CODE EMBARRESED ME INFRONT OF A META DEV AIFHEiuAFNHEOEFBouoIAEFbuhEHfiWPFEHu
     //TODO ADD DEL METHOD
     @DeleteMapping(value = "/deleteScrim/{scrimID}")
     ResponseEntity<Boolean> delScrim(
-            @NonNull @PathVariable String scrimID
+            @NonNull @PathVariable String scrimID,
+            @AuthenticationPrincipal OAuth2User principal
     ) {
         try {
-            return ResponseEntity.ok(main.deleteScrim(ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrimID + ".json"))));
+            ScrimmageImpl scimpl = ScrimmageImpl.fromFile(new File(SCRIM_PATH + scrimID + ".json"));
+
+            if(getUserInfo0(principal).equals(scimpl.organizer))
+                return ResponseEntity.ok(mane.deleteScrim(scimpl));
+        } catch (AuthorizationDeniedException e) {
+            return ResponseEntity.status(403).build();
         } catch (IOException | InterruptedException | TimeoutException e) {
             return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
         }
+
+        //SHOULD NEVER HAPPEN :0
+        return ResponseEntity.internalServerError().build();
     }
 
     @DeleteMapping(value = "/deleteTeam/{teamID}")
     ResponseEntity<Boolean> delTeam(
-            @NonNull @PathVariable int team
+            @NonNull @PathVariable int teamID,
+            @AuthenticationPrincipal OAuth2User principal
     ) {
         try {
-            return ResponseEntity.ok(main.deleteTeam(Team.of(new File(TEAM_PATH + team + ".json"))));
+            if(getUserInfo0(principal).getTeamNum() == (teamID))
+                return ResponseEntity.ok(mane.deleteTeam(Team.of(new File(TEAM_PATH + teamID + ".json"))));
+        } catch (AuthorizationDeniedException e) {
+            return ResponseEntity.status(403).build();
         } catch (IOException | InterruptedException | TimeoutException e) {
             return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
         }
+
+        return ResponseEntity.status(500).build();
+
     }
 
     @RequestMapping(value = "/wSpeed")

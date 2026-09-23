@@ -80,7 +80,7 @@ async function initGeeMap() {
             v: "weekly"
         });
 
-        void getTemu();
+        void getTemu(); //todo make decider page that checks if user logged in and direct to homepage OR OR OR dashboard
     } catch (error) {
         console.error("Failed to initialize Google Maps:", error);
     }

@@ -23,6 +23,7 @@ public class SillySecurityConfig {
         htp.authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/dashboard").authenticated()
                 .anyRequest().permitAll())
+        .formLogin(e -> e.loginPage("/auth-page"))
         .oauth2Login(l -> l
                 .defaultSuccessUrl("/dashboard"))
         .logout(l -> l
