@@ -1,0 +1,114 @@
+/* CSS styles */
+:root {
+    --kurio-red: #CF6A38;
+    --sharp-red: #CE5937;
+    --fein: #cd7149;
+    --fly: #FFFAFF;
+    --homepage-background: rgb(2,2,2);
+    --container-background: rgb(20,20,20);
+    --container-border: rgb(25, 25, 25);
+    --header-button-grey: rgb(40, 40, 40);
+    --inner-box-background: rgb(30, 30, 30);;
+    --inner-box-border: rgb(40, 40, 40);;
+    --open-status: forestgreen;
+    --closed-status: #df2c14;
+    --header-text: whitesmoke;
+    --non-header-text: #cdcdcd;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+body {
+    background-color: var(--homepage-background);
+    background-size: cover;
+    background-repeat: no-repeat;
+    user-select: text;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    div {
+        margin: 10px;
+    }
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#sign-up-text {
+    color: var(--header-text);
+    font-size: xxx-large;
+    font-family: Arial, ui-rounded;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#main-form-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-wower {
+    flex: 1;
+    display: flex;
+    margin: 15px;
+
+    input {
+        height: 30px;
+        flex: 1;
+        border-radius: 7px;
+    }
+}
+
+/*===================================================*/
+/*===================================================*/
+
+select {
+    margin: 2px;
+    padding: 5px 10px;
+    background-color: var(--lightened-inner-box-background);
+    border:5px solid var(--lightened-inner-box-border);
+    border-radius: 10px;
+    color: var(--fly);
+    font-weight: bold;
+}
+
+#nextbutton {
+    border: none;
+    outline: none;
+    fill: rgba(205, 205, 205, 0);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    align-content: center;
+    vertical-align: center;
+    color: var(--fly);
+    padding: 10px;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+[data-container-boxing] {
+    border: 3px solid var(--container-border);
+    box-shadow: 3px 3px var(--container-border);
+    border-radius: 10px;
+    background-color: var(--container-background);
+}
+
+/* IWFHIUWEHFwejfioBDIFOIwheikj.FKOKEBFoiWJEKFHoi,dHfikjlDSUFHUIhifuh9AIFuihseuifbSUIFhoiADFSO slop <2*/
+div[data-subelement-boxing="true"] {
+    background-color: var(--inner-box-background);
+    border:5px solid var(--inner-box-border);
+    box-shadow: 5px 5px var(--inner-box-border);
+    border-radius: 10px;
+}
+
+
+[data-appstatus="OPEN"] {
+    color: var(--open-status);
+}
+
+[data-appstatus="CLOSED"] {
+    color: var(--closed-status)
+}

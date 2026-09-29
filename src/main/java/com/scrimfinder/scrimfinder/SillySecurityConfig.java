@@ -25,10 +25,12 @@ public class SillySecurityConfig {
                 .anyRequest().permitAll())
         .formLogin(e -> e.loginPage("/auth-page"))
         .oauth2Login(l -> l
-                .defaultSuccessUrl("/dashboard"))
+                .defaultSuccessUrl("/login-redir"))
         .logout(l -> l
                 .logoutSuccessUrl("/homepage").permitAll()
-        );
+        ).csrf(withDefaults());
+
+        //todo brosmthismeGA brok idk you are broke get owne dieieieifiwafuiasdc sometimes the auth thingy doesnt work andf awiefnon
 
         return htp.build();
     }

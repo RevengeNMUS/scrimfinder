@@ -265,6 +265,17 @@ public class ServerRunner {
         return "homepage-redir";
     }
 
+    @GetMapping("/login-redir")
+    String loginredir(Model model) {
+        return "login-redir";
+    }
+
+    @GetMapping("/onboarding")
+    String createTeam(Model model) {
+        return "create-team";
+    }
+
+
     @GetMapping("/manageScrims")
     public String mScrims(Model model) {
         try {
@@ -352,20 +363,34 @@ public class ServerRunner {
 
 
     @PostMapping(value = "/createUser")
-    ResponseEntity<Boolean> createUser(@RequestBody JsonNode jNode) {
+    ResponseEntity<Boolean> createUser(
+            @RequestBody JsonNode jNode,
+            @AuthenticationPrincipal OAuth2User principal) {
         try {
+
             if (!rrwl.writeLock().tryLock(1000, TimeUnit.MILLISECONDS)) {
                 throw new TimeoutException("Timeout");
             }
 
+            if(!checkLogin0(principal)) {
+                throw new AuthorizationDeniedException("nuh uh :P");
+            }
+
+            System.out.println("/createUser Recieved");
+            System.out.println("User: " + principal.getAttribute("email"));
+
             File file = new File("src/main/resources/plsnolook/users.json");
 
             var team = Team.handleCreation(jNode);
-            ObjectNode smthsmth = oMapper.readTree(file).asObject();
-            smthsmth.put(jNode.get("loginUser").asString(), team.getTeamNum());
+            ObjectNode smthsmth = (ObjectNode) oMapper.readTree(file);
+
+            smthsmth.put(principal.getAttribute("email"), team.getTeamNum());
 
             oMapper.writerWithDefaultPrettyPrinter().writeValue(file, smthsmth);
             team.saveToFile();
+            return ResponseEntity.ok(true);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(403).build();
         } catch (IOException e) {
             return ResponseEntity.status(418).build();
         } catch (InterruptedException | TimeoutException e) {
@@ -373,11 +398,9 @@ public class ServerRunner {
         } finally {
             rrwl.writeLock().unlock();
         }
-
-        return ResponseEntity.ok(true);
     }
 
-
+    /*
     @PostMapping(value = "/createTeam")
     ResponseEntity<Boolean> createTeam(@RequestBody JsonNode jNode) {
         try {
@@ -389,6 +412,7 @@ public class ServerRunner {
 
         return ResponseEntity.ok(true);
     }
+    */
 
 
     /**
@@ -405,8 +429,11 @@ public class ServerRunner {
             mane.loadScrims();
             mane.loadTeams();
 
+            System.out.println("/createScrim Recieved");
+            System.out.println("User: " + principal.getAttribute("email"));
+
             var scrim = ScrimmageImpl.fromJNode(jNode);
-            if (getUserInfo0(principal).equals(scrim.organizer))
+            if (!getUserInfo0(principal).equals(scrim.organizer))
                 return ResponseEntity.status(403).build();
 
             scrim.saveToFile();
@@ -442,7 +469,6 @@ public class ServerRunner {
             @AuthenticationPrincipal OAuth2User principal) {
         try {
             mane.loadScrims();
-//          scrimID = scrimID.replace("%20", " ");
             ScrimmageImpl scrim = mane.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
             ScrimmageImpl updatedScrim = new ScrimmageImpl(scrim);
 
@@ -450,15 +476,15 @@ public class ServerRunner {
                 return ResponseEntity.status(403).build();
 
             if (region != null) {
-                scrim.setRegion(Region.fromCode(region));
+                updatedScrim.setRegion(Region.fromCode(region));
             }
 
             if (appStatus != null) {
-                scrim.setApplicationStatus(ApplicationStatus.fromStatusString(appStatus));
+                updatedScrim.setApplicationStatus(ApplicationStatus.fromStatusString(appStatus));
             }
 
             if (size != null) {
-                scrim.setSizeLimit(size);
+                updatedScrim.setSizeLimit(size);
             }
 
             mane.updateScrim(scrim, updatedScrim);
@@ -491,8 +517,6 @@ public class ServerRunner {
             if (getUserInfo0(principal).getTeamNum() != (id))
                 return ResponseEntity.status(403).build();
 
-
-            mane.loadTeams();
             Team oldTeam = mane.findTeam(id);
             Team newTeam = new Team(oldTeam);
 
@@ -574,16 +598,20 @@ public class ServerRunner {
 
     @GetMapping("/authName")
     ResponseEntity<JsonNode> authName(@AuthenticationPrincipal OAuth2User principal) {
-        return ResponseEntity.ok(oMapper.createObjectNode().putPOJO("name", principal.getAttribute("name")));
+        return ResponseEntity.ok(oMapper.createObjectNode().putPOJO("name", principal.getAttribute("email")));
     }
 
     @GetMapping("/authcheck")
     ResponseEntity<JsonNode> checkLogin(@AuthenticationPrincipal OAuth2User principal) {
+        return ResponseEntity.ok(oMapper.createObjectNode().put("authed", checkLogin0(principal)));
+    }
+
+    private boolean checkLogin0(@AuthenticationPrincipal OAuth2User principal) {
         try {
-            principal.getAttribute("name"); //scuffed, but should trhwo error
-            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", true));
+            principal.getAttribute("email"); //scuffed, but should trhwo error
+            return true;
         } catch (NullPointerException e) {
-            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", false));
+            return false;
         }
     }
 
@@ -591,11 +619,11 @@ public class ServerRunner {
     ResponseEntity<JsonNode> checkNewUser (@AuthenticationPrincipal OAuth2User principal) {
         try {
             rrwl.readLock().lock();
-            String name = principal.getAttribute("name"); //scuffed, but should trhwo error
+            String name = principal.getAttribute("email"); //scuffed, but should trhwo error
 
-            JsonNode jsonNode = oMapper.readTree("src/main/resources/plsnolook/users.json");
+            JsonNode jsonNode = oMapper.readTree(new File("src/main/resources/plsnolook/users.json"));
 
-            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", true).put("new-user", !jsonNode.has(name)));
+            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", true).put("newuser", !jsonNode.has(name)));
         } catch (NullPointerException e) {
             return ResponseEntity.ok(oMapper.createObjectNode().put("authed", false));
         } finally {
@@ -611,7 +639,7 @@ public class ServerRunner {
 
             rrwl.readLock().lock();
 
-            String name = principal.getAttribute("name"); //scuffed, but should trhwo error
+            String name = principal.getAttribute("email"); //scuffed, but should trhwo error
             if (name == null || name.isEmpty()) {
                 return ResponseEntity.ok(oMapper.createObjectNode().put("authed", false));
             }
@@ -642,7 +670,7 @@ public class ServerRunner {
 
             rrwl.readLock().lock();
 
-            String name = principal.getAttribute("name"); //scuffed, but should trhwo error
+            String name = principal.getAttribute("email"); //scuffed, but should trhwo error
             if (name == null || name.isEmpty()) {
                 throw new AuthorizationDeniedException("User not authenticated");
             }
@@ -715,6 +743,8 @@ public class ServerRunner {
             return ResponseEntity.internalServerError().build();
         }
     }*/
+
+    //todo MAKETHE EROR mpaweoiaing YOU DONut
 
     @RequestMapping("/")
     String explode() {

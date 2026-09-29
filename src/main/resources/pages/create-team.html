@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Scrimfinder - Create Team</title>
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/signumform.css}"/>
+    <script type="module" th:src="@{/jses/temrate.js}"></script>
 </head>
 <body>
+<div id="sign-up-text">
+    Sign Up!
+</div>
+<div id="main-form-container" data-container-boxing="true">
+    <form id="search-form"> <!-- todo ad-->
+        <div class="form-wower" data-subelement-boxing="true">
+            <input id="tNum" type="text" placeholder="sus it up" name="tNum">
+        </div>
 
+        <div class="form-wower" data-subelement-boxing="true">
+            <input id="tName" type="text" placeholder="suser it up" name="tName">
+        </div>
+
+        <div class="form-wower" data-subelement-boxing="true">
+            <select name="region" id="regions">
+                <option value="NORCAL" id="NORCAL" >Norcal</option>
+                <option value="SOCAL" id="SOCAL">Socal</option>
+            </select>
+            <input id="email" type="text" placeholder="susiestness it up" name="email">
+        </div>
+
+        <div class="form-wower">
+            <button type="submit" id="nextbutton" data-container-boxing="true">
+                Continue!
+            </button>
+        </div>
+    </form>
+</div>
 </body>
 </html>

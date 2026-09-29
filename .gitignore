@@ -35,5 +35,6 @@ bin/
 ### PROJECT FILES ###
 scrimmages/
 teams/
+plsnolook/
 *.iml
 *.properties
