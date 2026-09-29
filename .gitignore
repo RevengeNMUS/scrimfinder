@@ -35,6 +35,7 @@ bin/
 ### PROJECT FILES ###
 scrimmages/
 teams/
-plsnolook/
+users.json
 *.iml
 *.properties
+/src/main/resources/plsnolook/
