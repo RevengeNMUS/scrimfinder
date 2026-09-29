@@ -39,3 +39,4 @@ users.json
 *.iml
 *.properties
 /src/main/resources/plsnolook/
+!**/src/main/resources/plsnolook/
