@@ -2,7 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <title>Scrimfinder - Dashboard</title>
-    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/homepage-styles.css}" />
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/homepage-styles.css}"/>
+    <script>
+        async function redir() {
+            const sillybilly = await fetch("new-user-check");
+            const sillierbilly =  await sillybilly.json();
+            const silliestbilly = sillierbilly.authed;
+            if (!silliestbilly === true || sillierbilly.newuser) {
+                window.location.href = "/login-redir";
+            }
+        }
+
+        void redir();
+    </script>
 </head>
 <body th:style="|background-image:url(@{/spoinkydoinks/homepagebackgroundperhaps.png});|">
 <section>

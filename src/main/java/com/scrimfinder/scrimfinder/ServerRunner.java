@@ -596,9 +596,9 @@ public class ServerRunner {
         }
     }
 
-    @GetMapping("/authName")
-    ResponseEntity<JsonNode> authName(@AuthenticationPrincipal OAuth2User principal) {
-        return ResponseEntity.ok(oMapper.createObjectNode().putPOJO("name", principal.getAttribute("email")));
+    @GetMapping("/authEmail")
+    ResponseEntity<JsonNode> authEmaib(@AuthenticationPrincipal OAuth2User principal) {
+        return ResponseEntity.ok(oMapper.createObjectNode().putPOJO("email", principal.getAttribute("email")));
     }
 
     @GetMapping("/authcheck")

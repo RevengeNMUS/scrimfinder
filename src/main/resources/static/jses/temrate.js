@@ -1,3 +1,11 @@
+async function setitupsetitsetitup () {
+    const sillybilly = await fetch("authEmail");
+    const sillierbilly =  await sillybilly.json();
+    const silliestbilly = sillierbilly.email;
+
+    document.getElementById("email").setAttribute("value", silliestbilly)
+}
+
 async function redir() {
     const sillybilly = await fetch("new-user-check");
     const sillierbilly =  await sillybilly.json();
@@ -14,6 +22,8 @@ async function redir() {
 }
 
 void redir();
+
+void setitupsetitsetitup();
 
 const form = document.getElementById('search-form');
 
