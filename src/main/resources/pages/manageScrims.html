@@ -3,8 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Scrimfinder - Manage Scrims</title>
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/mancss.css}">
+    <script type="module" th:src="@{/jses/scrimman.js}"></script>
 </head>
 <body>
-
+<div id="site-header">
+    <div id="site-logo-header">
+        <div><a href="/homepage-redir"><img id="logo-image" th:src="@{/spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
+    </div>
+    <div id="site-buttons-header">
+        <div><a th:href="amongus.com"><button class="header-box" id="findScrims">Find Scrims</button></a></div>
+        <div><a th:href="amongus.com"><button class="header-box" id="manage-scrims">Manage Scrims</button></a></div>
+        <div><a th:href="amongus.com"><button class="header-box" id="profile">Profile</button></a></div>
+    </div>
+</div>
+<div id="evil-container" data-container-boxing="true">
+    <!--<div class="box">
+        <div class="nametag" data-inner-container-boxing="true">
+            name :0
+        </div>
+        <div class="waw">
+            <button class="edityummer" data-beegbutton="true">
+                edit
+            </button>
+            <button class="deleteyummer" data-beegbutton="true">
+                delete
+            </button>
+            <button class="shareyummer" data-beegbutton="true">
+                share
+            </button>
+        </div>
+    </div>-->
+</div>
+<div id="createScrimdiv">
+    <button id="createScrim" data-beegbutton="true">
+        wow
+    </button>
+</div>
+<footer id="site-footer">
+    <div class="footer-text">Created by Kuriosity Robotics, 12635</div>
+    <div class="footer-text">Reach out at <a href="mailto:kuriosityrobotics@gmail.com">kuriosityrobotics@gmail.com</a></div>
+</footer>
 </body>
 </html>

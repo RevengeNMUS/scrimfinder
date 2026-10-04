@@ -22,6 +22,7 @@ public class SillySecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity htp) throws Exception {
         htp.authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/dashboard").authenticated()
+                .requestMatchers("/manageScrims").authenticated()
                 .anyRequest().permitAll())
         .formLogin(e -> e.loginPage("/auth-page"))
         .oauth2Login(l -> l
@@ -30,8 +31,7 @@ public class SillySecurityConfig {
                 .logoutSuccessUrl("/homepage").permitAll()
         ).csrf(withDefaults());
 
-        //todo brosmthismeGA brok idk you are broke get owne dieieieifiwafuiasdc sometimes the auth thingy doesnt work andf awiefnon
-
+//we did i boyseb
         return htp.build();
     }
 }

@@ -277,7 +277,9 @@ public class ServerRunner {
 
 
     @GetMapping("/manageScrims")
-    public String mScrims(Model model) {
+    public String mScrims(
+            @AuthenticationPrincipal OAuth2User principal,
+            Model model) {
         try {
             mane.loadScrims();
             mane.loadTeams();
@@ -644,7 +646,7 @@ public class ServerRunner {
                 return ResponseEntity.ok(oMapper.createObjectNode().put("authed", false));
             }
 
-            JsonNode jsonNode = oMapper.readTree("src/main/resources/plsnolook/users.json");
+            JsonNode jsonNode = oMapper.readTree(new File("src/main/resources/plsnolook/users.json"));
 
             Team team = mane.findTeam(jsonNode.get(name).asInt());
 
@@ -674,7 +676,7 @@ public class ServerRunner {
             if (name == null || name.isEmpty()) {
                 throw new AuthorizationDeniedException("User not authenticated");
             }
-            JsonNode jsonNode = oMapper.readTree("src/main/resources/plsnolook/users.json");
+            JsonNode jsonNode = oMapper.readTree(new File("src/main/resources/plsnolook/users.json"));
 
             return mane.findTeam(jsonNode.get(name).asInt());
 
