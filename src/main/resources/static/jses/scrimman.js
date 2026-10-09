@@ -17,9 +17,11 @@ async function geebyegeegun() {
             jorban.setAttribute("data-appstatus", "OPEN")
 
             jorban.innerHTML=`
-            <div class="nametag" data-inner-container-boxing="true" >
-                ${oscrims[i].identifier}
-            </div>
+            <a href="scrim/${oscrims[i].identifier}">
+                <div class="nametag" data-inner-container-boxing="true">
+                    ${oscrims[i].identifier}
+                </div>
+            </a>
             <div class="waw">
                 <button class="edityummer" data-beegbutton="true">
                     edit
@@ -47,9 +49,11 @@ async function geebyegeegun() {
             jorban.setAttribute("data-appstatus", "CLOSED")
 
             jorban.innerHTML=`
-            <div class="nametag" data-inner-container-boxing="true" >
-                ${ascrims[i].identifier}
-            </div>
+            <a href="scrim/${ascrims[i].identifier}">
+                <div class="nametag" data-inner-container-boxing="true">
+                    ${ascrims[i].identifier}
+                </div>
+            </a>
             <div class="waw">
                 <button class="edityummer" data-beegbutton="true">
                     edit

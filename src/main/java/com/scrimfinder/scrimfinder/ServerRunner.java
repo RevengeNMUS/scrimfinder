@@ -294,6 +294,25 @@ public class ServerRunner {
         return "manageScrims";
     }
 
+    @GetMapping("/manageScrim/{idid}")
+    public String mScrim(
+            @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable String idid,
+            Model model) {
+        try {
+            mane.loadScrims();
+            mane.loadTeams();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().toString();
+        } catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().toString();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).toString();
+        }
+
+        return "manScrim";
+    }
+
     /**
      * WEIRDLY NAMED
      * but updates team to attend a scrim
@@ -350,8 +369,12 @@ public class ServerRunner {
             ScrimmageImpl scrim = mane.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
             Team team = mane.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
 
-            if (getUserInfo0(principal).getTeamNum() != (id))
+            if (
+                    getUserInfo0(principal).getTeamNum() != id ||
+                    getUserInfo0(principal).getTeamNum() != scrim.organizer.getTeamNum())
+            {
                 return ResponseEntity.status(403).build();
+            }
 
             return ResponseEntity.ok(mane.leaveScrim(team, scrim));
         } catch (AuthorizationDeniedException e) {

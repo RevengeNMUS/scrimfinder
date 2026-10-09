@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scrimfinder - Manage Scrims</title>
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/singleman.css}">
+    <script type="module" th:src="@{/jses/singlescrimman.js}"></script>
+</head>
+<body>
+<div id="site-header">
+    <div id="site-logo-header">
+        <div><a href="/homepage-redir"><img id="logo-image" th:src="@{/spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
+    </div>
+    <div id="site-buttons-header">
+        <div><a th:href="amongus.com"><button class="header-box" id="findScrims">Find Scrims</button></a></div>
+        <div><a th:href="amongus.com"><button class="header-box" id="manage-scrims">Manage Scrims</button></a></div>
+        <div><a th:href="amongus.com"><button class="header-box" id="profile">Profile</button></a></div>
+    </div>
+</div>
+<div id="evil-container" data-container-boxing="true">
+    <div id="scimid">
+        SCIMID
+    </div>
+    <div id="teameth">
+        teams: team team team team
+    </div>
+    <div id="sillybox">
+        <div id="appstatusstuff" class="firstderivative">
+            <button id="appstatus"
+                    data-beegbutton="true" data-appstatus="OPEN">
+                appstatus
+            </button>
+
+            <button id="appstatussubmit" data-beegbutton="true">
+                Save Status
+            </button>
+        </div>
+
+        <div id="sizestuff" class="firstderivative">
+            <input type="number" id="sizee" name="sizee" step="1" min="1" max="8">
+
+            <button id="sizelimitsubmit" data-beegbutton="true">
+                Save Size Limit
+            </button>
+        </div>
+
+        <div id="teamstuff" class="firstderivative">
+            <input type="number" id="numero" name="numero" step="1" value="1">
+
+            <button id="removeteamsubmit" data-beegbutton="true">
+                Remove Team
+            </button>
+        </div>
+    </div>
+</div>
+<footer id="site-footer">
+    <div class="footer-text">Created by Kuriosity Robotics, 12635</div>
+    <div class="footer-text">Reach out at <a href="mailto:kuriosityrobotics@gmail.com">kuriosityrobotics@gmail.com</a></div>
+</footer>
+</body>
+</html>
