@@ -58,7 +58,7 @@ public class ServerRunner {
     @Scheduled(cron = "59 59 * * * *")
     public void hourlyUpdate() {
         try{
-            mane.removeOutdatedScrims();
+            //mane.removeOutdatedScrims(); todo add back
         } catch (Exception e) {
             //cope :sob: go get a blt twin go rn rn go GO
         }
@@ -79,7 +79,7 @@ public class ServerRunner {
             mane.loadScrims();
 
             ArrayList<ScrimmageImpl> scrims = mane.findScrims(SearchFactory.buildScrimSearch());
-            scrims.sort(Comparator.comparing(o -> o.endTime));
+            scrims.sort(Comparator.comparing(o -> o.startTime));
             List<ScrimmageImpl> top_scrims = scrims.subList(0, Math.min(6, scrims.size()));
 
             var cities = new ArrayList<String>();
@@ -112,7 +112,7 @@ public class ServerRunner {
             mane.loadScrims();
 
             ArrayList<ScrimmageImpl> scrims = mane.findScrims(SearchFactory.buildScrimSearch());
-            scrims.sort(Comparator.comparing(o -> o.endTime));
+            scrims.sort(Comparator.comparing(o -> o.startTime));
             List<ScrimmageImpl> top_scrims = scrims.subList(0, Math.min(6, scrims.size()));
 
             var cities = new ArrayList<String>();
@@ -274,7 +274,6 @@ public class ServerRunner {
     String createTeam(Model model) {
         return "create-team";
     }
-
 
     @GetMapping("/manageScrims")
     public String mScrims(
@@ -457,7 +456,7 @@ public class ServerRunner {
             System.out.println("/createScrim Recieved");
             System.out.println("User: " + principal.getAttribute("email"));
 
-            var scrim = ScrimmageImpl.fromJNode(jNode);
+            var scrim = ScrimmageImpl.fromWebRequest(jNode, getUserInfo0(principal));
             if (!getUserInfo0(principal).equals(scrim.organizer))
                 return ResponseEntity.status(403).build();
 

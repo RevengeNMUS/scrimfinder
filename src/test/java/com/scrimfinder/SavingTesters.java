@@ -25,8 +25,7 @@ public class SavingTesters {
                 ApplicationStatus.OPEN,
                 organizer,
                 10,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusHours(3)
+                LocalDateTime.now()
         );
         File savedFile = scrim.saveToFile();
         printScrimInfo(scrim);
@@ -51,7 +50,7 @@ public class SavingTesters {
         System.out.println(scrim.getIdentifier());
         System.out.println(scrim.appStatus());
         System.out.println(scrim.startTime());
-        System.out.println(scrim.endTime());
+        System.out.println(scrim.startTime());
         System.out.println(scrim.isFull());
         System.out.println("___________________");
         printTeamInfo(scrim.scrimOrganizer());
@@ -75,8 +74,7 @@ public class SavingTesters {
                 ApplicationStatus.OPEN,
                 organizer,
                 10,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusHours(3)
+                LocalDateTime.now()
         ));
 
         for (Scrimmage scrim : mane.findScrims(SearchFactory.buildScrimSearch())) {

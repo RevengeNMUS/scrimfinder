@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Location {
     @JsonProperty("longitude")
     public final double longitude; //todo: make into a littol list?!??! vector??!!?
+    //todo: SLIME OUT THE ADDRESS AND CITY STUFF OH MY LORD
     public final double latitude;
     public final String address;
     public final String city;

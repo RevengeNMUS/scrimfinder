@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class LimitedScrim {
-    public static final com.scrimfinder.scrimfinder.ScrimmageImpl NULL_SCRIM = new com.scrimfinder.scrimfinder.ScrimmageImpl(new ArrayList<>(), Location.NULL_LOCATION, Region.KNOWHERE, ApplicationStatus.CLOSED, Team.NULL_TEAM, 0, LocalDateTime.of(0, 1, 1, 0, 0), LocalDateTime.of(0, 1, 1, 0, 0));
+    public static final com.scrimfinder.scrimfinder.ScrimmageImpl NULL_SCRIM = new com.scrimfinder.scrimfinder.ScrimmageImpl(new ArrayList<>(), Location.NULL_LOCATION, Region.KNOWHERE, ApplicationStatus.CLOSED, Team.NULL_TEAM, 0, LocalDateTime.of(0, 1, 1, 0, 0));
     private static final DateTimeFormatter parser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public String identifier;

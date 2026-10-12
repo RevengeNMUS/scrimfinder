@@ -14,7 +14,7 @@ async function getTemu() {
     document.getElementById("region").innerText = feetFarm.region;
     document.getElementById("identifier").innerText = feetFarm.identifier;
     document.getElementById("identifier").setAttribute("data-appstatus", feetFarm.appStatus);
-    document.getElementById("date").innerText = feetFarm.endTime.substring(0, 10);
+    document.getElementById("date").innerText = feetFarm.startTime.substring(0, 10);
     document.getElementById("status").innerText = feetFarm.appStatus;
 
     var tbox = document.getElementById("teamsbox");

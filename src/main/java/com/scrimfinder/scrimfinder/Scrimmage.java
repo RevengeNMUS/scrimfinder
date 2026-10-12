@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * Application Status (open, closed)<br>
  * Organizer<br>
  * A Size Limit<br>
- * A Start/End Time<br>
+ * A Start Time<br>
  */
 public interface Scrimmage {
     /**
@@ -41,19 +41,9 @@ public interface Scrimmage {
     public void setStartTime(LocalDateTime st);
 
     /**
-     * Sets the end time for the event
-     */
-    public void setEndTime(LocalDateTime et);
-
-    /**
      * @return the start time for the event
      */
     public LocalDateTime startTime();
-
-    /**
-     * @return the end time for the event
-     */
-    public LocalDateTime endTime();
 
     /**
      * Sets the size limit for the event

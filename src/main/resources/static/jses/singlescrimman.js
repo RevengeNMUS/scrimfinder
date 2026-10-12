@@ -58,7 +58,10 @@ async function saveStat() {
         headers: {
             'X-CSRF-TOKEN': token
         },
-    }).then(r => {console.log(`response recieved: ${r}`); window.location.reload()});
+    }).then(r => {console.log(`response recieved: ${r}`);});
+
+    window.alert("Info Changed! Reload :0");
+    window.location.reload();
 }
 
 async function saveSizz() {
@@ -77,6 +80,9 @@ async function saveSizz() {
             'X-CSRF-TOKEN': token
         },
     }).then(r => {console.log(`response recieved: ${r}`); window.location.reload()});
+
+    window.alert("Info Changed! Reload :0");
+    window.location.reload();
 }
 
 async function goonbyeTeam() {
@@ -95,6 +101,9 @@ async function goonbyeTeam() {
             'X-CSRF-TOKEN': token
         },
     }).then(r => {console.log(`response recieved: ${r}`); window.location.reload()});
+
+    window.alert("Info Changed! Reload :0");
+    window.location.reload();
 }
 
 //wawwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww

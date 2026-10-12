@@ -85,7 +85,7 @@ async function initRubberRoom() {
                         Date:
                     </div>
                     <div id="dateTime">
-                        ${scrim.endTime.substring(0, 10)}
+                        ${scrim.startTime.substring(0, 10)}
                     </div>
                 </div>`;
             scontainer.appendChild(sillybilly);
@@ -176,7 +176,7 @@ async function initGeemap() {
                             Date:
                         </div>
                         <div id="dateTime" style="color: var(--non-header-text);font-size: small;font-weight: 600;">
-                            ${scrims[i].endTime.substring(0, 10)}
+                            ${scrims[i].startTime.substring(0, 10)}
                         </div>
                     </div>
                 </div>`);

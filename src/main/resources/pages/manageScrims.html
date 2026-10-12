@@ -2,9 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Scrimfinder - Manage Scrims</title>
     <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/mancss.css}">
     <script type="module" th:src="@{/jses/scrimman.js}"></script>
+    <script>
+        // prettier-ignore
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+            key: "AIzaSyBndwE5U3xdTC9dochw9KrTgdbObujYH8E",
+            v: "weekly"
+        });
+    </script>
 </head>
 <body>
 <div id="site-header">
@@ -17,6 +26,42 @@
         <div><a th:href="amongus.com"><button class="header-box" id="profile">Profile</button></a></div>
     </div>
 </div>
+<dialog id="dialog" data-container-boxing="true">
+    <p> waw </p>
+    <form id="beegform" method="dialog">
+        <div id="normyinputs">
+            <input
+                    type="datetime-local"
+                    id="storttime"
+                    name="storttime"
+                    min="2026-06-07T00:00"
+                    max="2100-06-07T00:00"
+                    required>
+            <input
+                    type="number"
+                    id="sizer"
+                    name="sizer"
+                    step="1"
+                    min="1"
+                    max="8"
+                    required>
+        </div>
+        <div id="fancyone">
+            <select name="regiob" id="regiob">
+                <option value="NORCAL" id="NORCAL" >Norcal</option>
+                <option value="SOCAL" id="SOCAL">Socal</option>
+            </select>
+            <select name="stat" id="stat">
+                <option value="OPEN" id="OPEN" >Public</option>
+                <option value="CLOSED" id="CLOSED">Private</option>
+            </select>
+        </div>
+        <button
+                id="greb"
+                type="submit"
+                data-subelement-boxing="true">OK</button>
+    </form>
+</dialog>
 <div id="evil-container" data-container-boxing="true">
     <!--<div class="box">
         <div class="nametag" data-inner-container-boxing="true">

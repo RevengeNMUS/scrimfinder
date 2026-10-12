@@ -109,6 +109,46 @@ body {
 /*===================================================*/
 /*===================================================*/
 
+dialog {
+    color: var(--fly);
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    form {
+        input {
+            color: var(--fly);
+            background-color: var(--inner-box-background);
+            margin: 3px;
+            border: 00.1em;
+        }
+    }
+}
+
+dialog::backdrop {
+    background-image: linear-gradient(45deg, rgb(30,30,30), black);
+    opacity: 0.85;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form > div {
+    margin: 2px;
+    padding: 2px;
+}
+
+#normyinputs {
+    display: flex;
+}
+
+#storttime {
+    flex: 1;
+}
+
+/*===================================================*/
+/*===================================================*/
+
 #evil-container {
     padding:13px;
     margin: 15px;

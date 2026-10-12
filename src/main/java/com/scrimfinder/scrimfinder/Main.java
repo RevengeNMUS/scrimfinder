@@ -34,7 +34,7 @@ public class Main implements AutoCloseable{
 
     public void removeOutdatedScrims() throws IOException, InterruptedException, TimeoutException {
         for (ScrimmageImpl scrim : scrims) {
-            if (LocalDateTime.now().isBefore(scrim.endTime())) {
+            if (!LocalDateTime.now().isBefore(scrim.startTime)) {
                 deleteScrim(scrim);
             }
         }

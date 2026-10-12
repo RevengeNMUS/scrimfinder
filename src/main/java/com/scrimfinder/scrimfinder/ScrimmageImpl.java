@@ -27,7 +27,7 @@ import static com.scrimfinder.scrimfinder.MainConstants.SCRIM_PATH;
  * <li>A Start/End Time</li>
  */
 public class ScrimmageImpl implements Scrimmage {
-    public static final ScrimmageImpl NULL_SCRIM = new ScrimmageImpl(new ArrayList<>(), Location.NULL_LOCATION, Region.KNOWHERE, ApplicationStatus.CLOSED, Team.NULL_TEAM, 0, LocalDateTime.of(0, 1, 1, 0, 0), LocalDateTime.of(0, 1, 1, 0, 0));
+    public static final ScrimmageImpl NULL_SCRIM = new ScrimmageImpl(new ArrayList<>(), Location.NULL_LOCATION, Region.KNOWHERE, ApplicationStatus.CLOSED, Team.NULL_TEAM, 0, LocalDateTime.of(0, 1, 1, 0, 0));
 
     public ArrayList<Team> teams;
     public Location location;
@@ -36,9 +36,8 @@ public class ScrimmageImpl implements Scrimmage {
     public Team organizer;
     public int sizeLimit;
     public LocalDateTime startTime;
-    public LocalDateTime endTime;
 
-    public ScrimmageImpl(ArrayList<Team> teams, Location location, Region region, ApplicationStatus applicationStatus, Team organizer, int sizeLimit, LocalDateTime startTime, LocalDateTime endTime) {
+    public ScrimmageImpl(ArrayList<Team> teams, Location location, Region region, ApplicationStatus applicationStatus, Team organizer, int sizeLimit, LocalDateTime startTime) {
         this.teams = teams;
         this.location = location;
         this.region = region;
@@ -46,7 +45,6 @@ public class ScrimmageImpl implements Scrimmage {
         this.organizer = organizer;
         this.sizeLimit = sizeLimit;
         this.startTime = startTime.plusMinutes(startTime.getMinute()%15 < 8 ? -(startTime.getMinute()%15) : (15-startTime.getMinute()%15)).withSecond(0).withNano(0); //round to 67
-        this.endTime = endTime.plusMinutes(endTime.getMinute()%15 < 8 ? -(endTime.getMinute()%15) : (15-endTime.getMinute()%15)).withSecond(0).withNano(0);
     }
 
     public ScrimmageImpl(ScrimmageImpl scrim) {
@@ -57,7 +55,6 @@ public class ScrimmageImpl implements Scrimmage {
         this.organizer = scrim.organizer;
         this.sizeLimit = scrim.sizeLimit;
         this.startTime = scrim.startTime;
-        this.endTime = scrim.endTime;
     }
 
     public static ScrimmageImpl fromFile(File file) {
@@ -74,9 +71,12 @@ public class ScrimmageImpl implements Scrimmage {
     public static ScrimmageImpl fromJNode(JsonNode jsonNode) throws IOException {
 
         ArrayList<Team> teams = new ArrayList<>();
-        var tArrNode = jsonNode.get("teams").asArray();
-        for (JsonNode tNode : tArrNode.elements()) {
-            teams.add(Team.of(new File(MainConstants.TEAM_PATH + tNode.get("teamNum").asInt(0) + ".json"))); // mark all teams as atendees for ts srim you drat
+
+        if (jsonNode.has("teams")) {
+            var tArrNode = jsonNode.get("teams").asArray();
+            for (JsonNode tNode : tArrNode.elements()) {
+                teams.add(Team.of(new File(MainConstants.TEAM_PATH + tNode.get("teamNum").asInt(0) + ".json"))); // mark all teams as atendees for ts srim you drat
+            }
         }
 
         var locNode = jsonNode.get("location");
@@ -91,8 +91,6 @@ public class ScrimmageImpl implements Scrimmage {
         var parser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         var startDT = jsonNode.get("startTime").asString("0000-00-00'T'00:00:00");
         var startTime = LocalDateTime.parse(startDT, parser);
-        var endDT = jsonNode.get("endTime").asString("0000-00-00'T'00:00:00");
-        var endTime = LocalDateTime.parse(endDT, parser);
 
         Team organizer;
         try {
@@ -101,7 +99,40 @@ public class ScrimmageImpl implements Scrimmage {
             organizer = new Team(jsonNode.get("organizer").get("teamNum").asInt(0));
         }
 
-        var returnScrim = new ScrimmageImpl(teams, location, region, applicationStatus, organizer, sizeLimit, startTime, endTime);
+        var returnScrim = new ScrimmageImpl(teams, location, region, applicationStatus, organizer, sizeLimit, startTime);
+
+        for (Team team : teams) {
+            team.attendeeFor(returnScrim.toLimitedScrim());
+            team.saveToFile();
+        }
+
+        if (!organizer.isOrganizing(returnScrim.toLimitedScrim().identifier)) {
+            organizer.organizerFor(returnScrim.toLimitedScrim());
+            organizer.saveToFile();
+        }
+
+        return returnScrim;
+    }
+
+    public static ScrimmageImpl fromWebRequest(JsonNode jsonNode, Team orgTeam) throws IOException {
+
+        ArrayList<Team> teams = new ArrayList<>();
+
+        var locNode = jsonNode.get("location");
+        var location = new Location(locNode.get("longitude").asDouble(0.0), locNode.get("latitude").asDouble(0.0), locNode.get("address").asString(" "), locNode.get("city").asString(" "), locNode.get("state").asString(" "), locNode.get("country").asString(" "));
+        var region = Region.fromCode(jsonNode.get("region").asString());
+        var applicationStatus = ApplicationStatus.valueOf(jsonNode.get("appStatus").asString("CLOSED"));
+        var sizeLimit = jsonNode.get("size").asInt(1);
+
+        var parser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        var startDT = jsonNode.get("startTime").asString("0000-00-00'T'00:00:00");
+        var startTime = LocalDateTime.parse(startDT, parser);
+
+        Team organizer;
+        organizer = orgTeam;
+
+
+        var returnScrim = new ScrimmageImpl(teams, location, region, applicationStatus, organizer, sizeLimit, startTime);
 
         for (Team team : teams) {
             team.attendeeFor(returnScrim.toLimitedScrim());
@@ -153,29 +184,11 @@ public class ScrimmageImpl implements Scrimmage {
     }
 
     /**
-     * Sets the end time for the event
-     *
-     * @param et end time
-     */
-    @Override
-    public void setEndTime(LocalDateTime et) {
-        endTime = et;
-    }
-
-    /**
      * @return the start time for the event
      */
     @Override
     public LocalDateTime startTime() {
         return startTime;
-    }
-
-    /**
-     * @return the end time for the event
-     */
-    @Override
-    public LocalDateTime endTime() {
-        return endTime;
     }
 
     /**
@@ -265,7 +278,7 @@ public class ScrimmageImpl implements Scrimmage {
      */
     @Override
     public boolean isFull() {
-        return sizeLimit != -1 && teams.size() > sizeLimit;
+        return sizeLimit != -1 && teams.size() >= sizeLimit;
     }
 
     /**
@@ -328,7 +341,6 @@ public class ScrimmageImpl implements Scrimmage {
         oNode.putIfAbsent("teams", tempArrN);
         var parser = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         oNode.put("startTime", startTime.format(parser));
-        oNode.putPOJO("endTime", endTime.format(parser));
         oNode.put("size", sizeLimit);
 
         return oNode;

@@ -25,8 +25,7 @@ public class CreateTester {
                 ApplicationStatus.OPEN,
                 organizer,
                 10,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusHours(3)
+                LocalDateTime.now()
         ));
         mane.saveScrims();
         mane.close();
