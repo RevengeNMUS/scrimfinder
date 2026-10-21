@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Scrimfinder - Profile</title>
+    <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/profprof.css}"/>
+    <script type="module" th:src="@{/jses/profprof.js}"></script>
+</head>
+<body th:style="|background-image:url(@{/spoinkydoinks/homepagebackgroundperhaps.png});|">
+<section>
+    <div id="site-header">
+        <div id="site-logo-header">
+            <div>
+                <a href="/homepage-redir"
+                ><img
+                        id="logo-image"
+                        th:src="@{/spoinkydoinks/scrimfinder-logo-wip.png}"
+                        alt="Logo"
+                /></a>
+            </div>
+        </div>
+        <div id="site-buttons-header">
+            <div>
+                <a href="/searchScrims"
+                ><button class="header-box" id="findScrims">
+                    Find Scrims
+                </button></a
+                >
+            </div>
+            <div>
+                <a href="/manageScrims"
+                ><button class="header-box" id="manage-scrims">
+                    Manage Scrims
+                </button></a
+                >
+            </div>
+            <div>
+                <a href="/profile"
+                ><button class="header-box" id="profile">Profile</button></a
+                >
+            </div>
+        </div>
+    </div>
+    <div id="homepage-container" data-container-boxing>
+        <div id="titlemm">
+            <p>Hi, <span id="TNUM"> John </span></p>
+        </div>
+        <form id="infomlem">
+            <div class="boxyboys" id="namebox" data-container-boxing>
+                <label for="nam">Name: </label>
+                <input type="text" name="nam" id="nam" />
+            </div>
+            <div class="boxyboys" id="regionbox" data-container-boxing>
+                <label for="reg">Region: </label>
+                <select name="reg" id="reg">
+                    <option value="NORCAL" id="NORCAL">
+                        NORCAL
+                    </option>
+                    <option value="SOCAL" id="SOCAL">
+                        SOCAL
+                    </option>
+                    <option value="KNOWHERE" id="KNOWHERE">
+                        KNOWHERE
+                    </option>
+                </select>
+            </div>
+            <div class="boxyboys" id="contactbox" data-container-boxing>
+                <label for="contact">Contact: </label>
+                <input type="text" name="contact" id="contact" />
+            </div>
+            <button type="submit" id="submit">Submit</button>
+        </form>
+    </div>
+    <footer id="site-footer">
+        <div class="footer-text">Created by Kuriosity Robotics, 12635</div>
+        <div class="footer-text">
+            Reach out at
+            <a href="mailto:kuriosityrobotics@gmail.com"
+            >kuriosityrobotics@gmail.com</a
+            >
+        </div>
+    </footer>
+</section>
+</body>
+</html>

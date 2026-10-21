@@ -116,7 +116,7 @@ body {
     flex-direction: column;
     align-content: space-evenly;
 
-    * {
+    div {
         margin: 0.5em 0;
     }
 }
@@ -133,7 +133,7 @@ body {
 }
 
 .side-titles, #middle-title-container {
-/*    padding: 1rem 1.5rem; */
+    /*    padding: 1rem 1.5rem; */
     color: var(--fein);
 }
 
@@ -256,6 +256,49 @@ gmp-map {
     margin-bottom: 10px;
     align-self: center;
     justify-self: left;
+}
+
+/*===================================================*/
+/*===================================================*/
+
+#jlbuttons {
+    display: flex;
+    justify-content: center;
+}
+
+.amongus {
+    padding: 1em 6em;
+    margin-left:1em;
+    margin-right: 1em;
+    font-weight: 670;
+}
+
+.amongus {
+    font-family: Arial, ui-rounded;
+    font-weight: 800;
+    color: var(--fein);
+    position: relative;
+    left: -1px;
+    top: -2px;
+    box-shadow: 1px 2px;
+    background-color: var(--header-button-grey);
+    border-radius:10px;
+    border-color: var(--fein);
+    border-style: solid;
+}
+
+.amongus:hover {
+    cursor: pointer;
+    box-shadow: 0 0;
+    background-color: rgb(50,50,50);
+    position: relative;
+    left: 0px;
+    top: 0px;
+}
+
+.amongus:disabled {
+    filter: grayscale(67%) opacity(0.7);
+    pointer-events: none;
 }
 
 /*===================================================*/

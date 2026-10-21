@@ -70,16 +70,38 @@ async function geebyegeegun() {
                 </div>
             </a>
             <div class="waw">
-                <button class="deleteyummer" data-beegbutton="true">
+                <button class="deleteyummer" id="deleteyummer-${ascrims[i].identifier}" data-beegbutton="true">
                     delete
                 </button>
-                <button class="shareyummer" data-beegbutton="true">
+                <button class="shareyummer" id="shareyummer-${ascrims[i].identifier}" data-beegbutton="true">
                     share
                 </button>
-            </div>
-        `;
+            </div>`;
 
             elementofsurprise.appendChild(jorban);
+
+            document.getElementById(`shareyummer-${ascrims[i].identifier}`).addEventListener(
+                "click",
+                action => {
+                    navigator.clipboard.writeText(`http://localhost:8080/scrim/${ascrims[i].identifier}`);
+                }
+            );
+
+            document.getElementById(`deleteyummer-${ascrims[i].identifier}`).addEventListener(
+                "click",
+                async action =>
+                {
+                    await fetch(`http://localhost:8080/deleteScrim/${ascrims[i].identifier}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': token
+                        },
+                    }).then(r => {console.log(`response recieved: ${r}`); window.location.reload()});
+
+                    window.alert("Info Changed! Reload :0");
+                    window.location.reload();
+                }
+            );
         }
     }
 }

@@ -105,11 +105,12 @@ public class Main implements AutoCloseable{
         return returnBool;
     }
 
-    public boolean updateScrim(Scrimmage scrim, ScrimmageImpl updatedScrim) throws IOException, InterruptedException, TimeoutException {
+    public boolean updateScrim(ScrimmageImpl scrim, ScrimmageImpl updatedScrim) throws IOException, InterruptedException, TimeoutException {
         if (!scrims.contains(scrim)) {
             throw new ResourceNotFoundException();
         }
 
+        scrim.deleteFile();
         scrims.remove(scrim);
         scrims.add(updatedScrim);
 
@@ -237,7 +238,7 @@ public class Main implements AutoCloseable{
         throw new ResourceNotFoundException("Resource not found for team name " + tName);
     }
 
-    public static ArrayList<Team> findTeams(ArrayList<Team> teams, TeamSearch ts) {
+    public static ArrayList<Team> findTeams(ArrayList<Team> teams, TeamSearch ts) throws ResourceNotFoundException {
         var returnList = new ArrayList<Team>();
         for (Team team : teams) {
             if (ts.isFound(team)) {
@@ -247,17 +248,17 @@ public class Main implements AutoCloseable{
 
         if (returnList.isEmpty()) {
             //resort to throwing rotten tomatoes (exception) at user
-//          throw new ResourceNotFoundException("No resources found for  " + ts.finderMethod());
+            throw new ResourceNotFoundException("No resources found for  " + ts.finderMethod());
         }
 
         return returnList;
     }
 
-    public ArrayList<Team> findTeams(TeamSearch ts) {
+    public ArrayList<Team> findTeams(TeamSearch ts) throws ResourceNotFoundException {
         return findTeams(teams, ts);
     }
 
-    public ArrayList<ScrimmageImpl> findScrims(ScrimSearch ss) {
+    public ArrayList<ScrimmageImpl> findScrims(ScrimSearch ss) throws ResourceNotFoundException {
         var returnList = new ArrayList<ScrimmageImpl>();
 
         for (Scrimmage scrim : scrims) {
@@ -268,7 +269,7 @@ public class Main implements AutoCloseable{
 
         if (returnList.isEmpty()) {
             //resort to throwing rotten tomatoes at user
-//          throw new ResourceNotFoundException("No resources found for  " + ss.finderMethod());
+            throw new ResourceNotFoundException("No resources found for  " + ss.finderMethod());
         }
 
         return returnList;
@@ -291,21 +292,71 @@ public class Main implements AutoCloseable{
         return returnList;
     }
 
-    public boolean joinScrim(Team team, Scrimmage scrim) throws IOException, InterruptedException, TimeoutException {
+    public boolean joinScrim(Team team, String scrimID) throws IOException, InterruptedException, TimeoutException {
+        loadScrims();
+        loadTeams();
+
+        var identifierList = findScrims(SearchFactory.buildScrimSearch(scrimID));
+        var scrim = identifierList.get(0);
+
+        //normally owuld check if scrim exists alr but cope I suppose :sob:
+
+        if (scrim.teamsInScrim().contains(team)) {
+            return false;
+        }
+
         var rBool = team.attendeeFor(scrim.toLimitedScrim());
+
         scrim.addTeam(team);
-        //if smth dies, it dies HERE :000
-        saveTeams();
+        scrim.saveToFile();
+
+        System.out.println("scrims size = " + scrims.size());
+        System.out.println("joining team " + team.getTeamNum() +
+                " to scrim " + scrim.getIdentifier());
+        System.out.println(team.getTeamName() + " joinethed scrim: " + scrimID);
+
         saveScrims();
+        saveTeams();
+
+        loadScrims();
+        loadTeams();
+
+        System.out.println("POST SAVED: team in " + scrimID + "? : " + findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst().hasTeam(team));
+
         return rBool;
     }
 
-    public boolean leaveScrim(Team team, Scrimmage scrim) throws IOException, InterruptedException, TimeoutException {
+    public boolean leaveScrim(Team team, String scrimID) throws IOException, InterruptedException, TimeoutException {
+        loadScrims();
+        loadTeams();
+
+
+        var identifierList = findScrims(SearchFactory.buildScrimSearch(scrimID));
+        var scrim = identifierList.get(0);
+
+        //normally owuld check if scrim exists alr but cope I suppose :sob:
+
+        if (!scrim.teamsInScrim().contains(team)) {
+            return false;
+        }
+
         var rBool = team.notAttending(scrim.toLimitedScrim());
         scrim.removeTeam(team);
-        //if smth dies, it dies HERE :000
-        saveTeams();
+        scrim.saveToFile();
+
+        System.out.println("scrims size = " + scrims.size());
+        System.out.println("leaving team " + team.getTeamNum() +
+                " to scrim " + scrim.getIdentifier());
+        System.out.println(team.getTeamName() + " leaveethed scrim: " + scrimID);
+
         saveScrims();
+        saveTeams();
+
+        loadScrims();
+        loadTeams();
+
+        System.out.println("POST SAVED: team out of " + scrimID + "? : " + findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst().hasTeam(team));
+
         return rBool;
     }
 

@@ -2,21 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="|Scrimfinder - ${scrim.identifier}|">Scrimfinder -</title>
     <link rel="stylesheet" th:href="@{/stylusshockedfaceemoji/scrimbled-eggs.css}">
     <script type="module" th:src="@{/jses/scim.js}"></script>
 </head>
 <body th:style="|background-image:url(@{/spoinkydoinks/homepagebackgroundperhaps.png});|">
-<div id="site-header" data-container-boxing="true">
+<div id="site-header">
     <div id="site-logo-header">
         <div><a href="/homepage-redir"><img id="logo-image" th:src="@{/spoinkydoinks/scrimfinder-logo-wip.png}" alt="Logo"/></a></div>
     </div>
     <div id="site-buttons-header">
-        <div><a href='/searchScrims'><button class="header-box" id="findScrims">Find Scrimmages</button></a></div>
-        <div><a th:href="amongus.com"><button class="header-box" id="login-signup"> Login/Sign Up </button></a></div>
+        <div><a href="/searchScrims"><button class="header-box" id="findScrims">Find Scrims</button></a></div>
+        <div><a href="/manageScrims"><button class="header-box" id="manage-scrims">Manage Scrims</button></a></div>
+        <div><a href="/profile"><button class="header-box" id="profile">Profile</button></a></div>
     </div>
 </div>
-
 <div id="main-homepage-container">
     <div id="titles-box" data-container-boxing="true">
         <div class="side-titles" id="region">
@@ -55,6 +57,14 @@
             <gmp-map id="sillylilmap" center="-25.344,131.031" zoom="7" map-id="8444e43957e825dbbe3e563f">
             </gmp-map>
         </div>
+    </div>
+    <div id="jlbuttons">
+        <button id="jbutton" class="amongus" data-container-boxing data-appstatus="OPEN">
+            + Scrim
+        </button>
+        <button id="lbutton" class="amongus" data-container-boxing data-appstatus="CLOSED">
+            - Scrim
+        </button>
     </div>
 </div>
 

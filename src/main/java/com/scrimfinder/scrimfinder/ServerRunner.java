@@ -312,33 +312,86 @@ public class ServerRunner {
         return "manScrim";
     }
 
+    @GetMapping("/profile")
+    public String profff(
+            @AuthenticationPrincipal OAuth2User principal,
+            Model model) {
+        try {
+            mane.loadScrims();
+            mane.loadTeams();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().toString();
+        } catch (IOException | InterruptedException e) {
+            return ResponseEntity.internalServerError().toString();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).toString();
+        }
+
+        return "prof";
+    }
+
     /**
      * WEIRDLY NAMED
      * but updates team to attend a scrim
      *
-     * @param id the id of the team to be added to a scrim
      * @param scrimID the scrimmage id to be added (formatted as identifier param)
      */
-    @PutMapping("/teamJoinScrim/{id}")
-    ResponseEntity<Boolean> tJoinScrim(
-            @NonNull @PathVariable int id,
-            @NonNull @RequestParam(value = "scrimID") String scrimID,
+    @PutMapping("/teamJoinScrim/{scrimID}")
+    ResponseEntity<JsonNode> tJoinScrim(
+            @NonNull @PathVariable String scrimID,
             @AuthenticationPrincipal OAuth2User principal
     ) {
         try {
-
-            if (getUserInfo0(principal).getTeamNum() != (id))
-                return ResponseEntity.status(403).build();
-
-
             mane.loadTeams();
             mane.loadScrims();
 
+            System.out.println("susus amongus " + scrimID);
+            System.out.println("more sus " + getUserInfo0(principal));
+
             ScrimmageImpl scrim = mane.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
-            Team team = mane.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
+            System.out.println(scrim.toString());
+
+            Team team = (getUserInfo0(principal)); //i think im stupid
 
 
-            return ResponseEntity.ok(mane.joinScrim(team, scrim));
+            return ResponseEntity.ok(oMapper.createObjectNode().put("success", mane.joinScrim(team, scrimID)));
+        } catch (AuthorizationDeniedException e) {
+            System.out.println("frick yew " + e.toString());
+            return ResponseEntity.status(403).build();
+        } catch (ResourceNotFoundException e) {
+            System.out.println("frick yew " + e.toString());
+            return ResponseEntity.notFound().build();
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            System.out.println("frick yew " + e.toString());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * WEIRDLY NAMED
+     * but updates team to not attend a scrim
+     *
+     * @param scrimID the scrimmage id to be removed (formatted as identifier param)
+     */
+    @PutMapping("/teamLeaveScrim/{scrimID}")
+    ResponseEntity<JsonNode> tLeaveScrim(
+            @NonNull @PathVariable String scrimID,
+            @AuthenticationPrincipal OAuth2User principal
+    ) {
+        try {
+            mane.loadTeams();
+            mane.loadScrims();
+
+            System.out.println("susus amongus " + scrimID);
+            System.out.println("more sus " + getUserInfo0(principal));
+
+            ScrimmageImpl scrim = mane.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
+            System.out.println(scrim.toString());
+
+            Team team = (getUserInfo0(principal)); //i think im stupid
+
+
+            return ResponseEntity.ok(oMapper.createObjectNode().put("success", mane.leaveScrim(team, scrimID)));
         } catch (AuthorizationDeniedException e) {
             return ResponseEntity.status(403).build();
         } catch (ResourceNotFoundException e) {
@@ -350,15 +403,14 @@ public class ServerRunner {
 
     /**
      * WEIRDLY NAMED
-     * but updates team to not attend a scrim
+     * checks if logged in team is in scrim
      *
-     * @param id the id of the team to be removed from a scrim
      * @param scrimID the scrimmage id to be removed (formatted as identifier param)
      */
-    @PutMapping("/teamLeaveScrim/{id}")
-    ResponseEntity<Boolean> tLeaveScrim(
-            @NonNull @PathVariable int id,
-            @NonNull @RequestParam(value = "scrimID") String scrimID,
+
+    @GetMapping("/joinable/{scrimID}")
+    ResponseEntity<JsonNode> joinable(
+            @NonNull @PathVariable String scrimID,
             @AuthenticationPrincipal OAuth2User principal
     ) {
         try {
@@ -366,22 +418,16 @@ public class ServerRunner {
             mane.loadScrims();
 
             ScrimmageImpl scrim = mane.findScrims(SearchFactory.buildScrimSearch(scrimID)).getFirst();
-            Team team = mane.findTeams(SearchFactory.buildTeamSearch(id)).getFirst(); //slop but get owned ig
 
-            if (
-                    getUserInfo0(principal).getTeamNum() != id ||
-                    getUserInfo0(principal).getTeamNum() != scrim.organizer.getTeamNum())
-            {
-                return ResponseEntity.status(403).build();
-            }
-
-            return ResponseEntity.ok(mane.leaveScrim(team, scrim));
-        } catch (AuthorizationDeniedException e) {
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", true).putPOJO("full", scrim.isFull()).putPOJO("hasTeam", scrim.hasTeam(getUserInfo0(principal))));
+        } catch (NullPointerException e) {
+            return ResponseEntity.ok(oMapper.createObjectNode().put("authed", false));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
-        } catch (IOException | TimeoutException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
+        } catch (TimeoutException e) {
+            return ResponseEntity.status(418).build();
         }
     }
 
@@ -524,18 +570,13 @@ public class ServerRunner {
     }
 
     /**
-     *
      * @param id
-     * @param name
-     * @param region
      * @return
      */
     @PutMapping(value = "/modifyTeam/{id}")
     ResponseEntity<Boolean> modTeam(
             @NonNull @PathVariable int id,
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "email", required = false) String email,
-            @RequestParam(value = "region", required = false) String region,
+            @RequestBody JsonNode jNode,
             @AuthenticationPrincipal OAuth2User principal) {
         try {
             if (getUserInfo0(principal).getTeamNum() != (id))
@@ -544,16 +585,16 @@ public class ServerRunner {
             Team oldTeam = mane.findTeam(id);
             Team newTeam = new Team(oldTeam);
 
-            if (region != null) {
-                newTeam.setRegion(Region.fromCode(region));
+            if (jNode.get("region") != null) {
+                newTeam.setRegion(Region.fromCode(jNode.get("region").asString()));
             }
 
-            if (name != null) {
-                newTeam.setTeamName(name);
+            if (jNode.get("name") != null) {
+                newTeam.setTeamName(jNode.get("name").asString());
             }
 
-            if (email != null) {
-                newTeam.setEmail(email);
+            if (jNode.get("email") != null) {
+                newTeam.setEmail(jNode.get("email").asString());
             }
 
             mane.updateTeam(oldTeam, newTeam);

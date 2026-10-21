@@ -27,7 +27,7 @@ public interface Scrimmage {
      * Might fail if the scrimmage is full, or applications are closed
      * @return whether the attempt was successful
      */
-    public boolean addTeam(Team team);
+    public boolean addTeam(Team team) throws IOException;
 
     /**
      * Tries to remove a team from this scrimmage.

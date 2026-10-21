@@ -155,8 +155,11 @@ public class ScrimmageImpl implements Scrimmage {
      * @return whether the attempt was successful
      */
     @Override
-    public boolean addTeam(Team team) {
-        if (teams.size() >= sizeLimit || applicationStatus == ApplicationStatus.CLOSED || hasTeam(team) || organizer.isOrganizing(this.getIdentifier())) //aPPARENTLY size WORKS?!?!?!? waw
+    public boolean addTeam(Team team) throws IOException {
+        if (teams.size() >= sizeLimit
+                || applicationStatus == ApplicationStatus.CLOSED
+                || hasTeam(team)
+                || team.isOrganizing(this.getIdentifier())) //aPPARENTLY size WORKS?!?!?!? waw
             return false;
         teams.add(team);
         return true;

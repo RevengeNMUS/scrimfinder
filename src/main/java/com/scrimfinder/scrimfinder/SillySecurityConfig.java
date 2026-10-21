@@ -23,10 +23,12 @@ public class SillySecurityConfig {
         htp.authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/dashboard").authenticated()
                 .requestMatchers("/manageScrims").authenticated()
+                .requestMatchers("/profile").authenticated()
+                .requestMatchers("/scrim").authenticated()
                 .anyRequest().permitAll())
         .formLogin(e -> e.loginPage("/auth-page"))
         .oauth2Login(l -> l
-                .defaultSuccessUrl("/login-redir"))
+                .defaultSuccessUrl("/login-redir", true))
         .logout(l -> l
                 .logoutSuccessUrl("/homepage").permitAll()
         ).csrf(withDefaults());
